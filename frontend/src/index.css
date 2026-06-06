@@ -53,11 +53,8 @@
 .pdf-exporting {
   width: 800px !important;
   max-width: 800px !important;
-  margin: 0 !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  z-index: 9999 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
 }
 
 .pdf-exporting .overflow-x-auto {
