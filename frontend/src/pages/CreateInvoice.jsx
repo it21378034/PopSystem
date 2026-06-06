@@ -317,13 +317,6 @@ export default function CreateInvoice() {
                 Print
               </button>
               <button
-                onClick={handleGeneratePDF}
-                className="flex items-center gap-1.5 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-slate-800 hover:to-slate-900 text-white font-semibold px-3 py-2 rounded-lg text-sm transition shadow"
-              >
-                <DocumentTextIcon className="h-4 w-4" />
-                Generate PDF
-              </button>
-              <button
                 onClick={() => setSaved(false)}
                 className="flex items-center gap-1.5 bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 dark:hover:bg-amber-800/40 text-amber-700 dark:text-amber-400 font-semibold px-3 py-2 rounded-lg text-sm transition border border-amber-200 dark:border-amber-700"
                 title="Unlock to edit this invoice"
