@@ -208,14 +208,18 @@ export default function CreateInvoice() {
           scale: 2.2,
           useCORS: true,
           logging: false,
-          backgroundColor: "#ffffff"
+          backgroundColor: "#ffffff",
+          windowWidth: 1024
         },
         jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
       };
 
+      element.classList.add("pdf-exporting");
       await html2pdf().from(element).set(opt).save();
+      element.classList.remove("pdf-exporting");
     } catch (err) {
       console.error("Failed to generate PDF:", err);
+      invoiceRef.current?.classList.remove("pdf-exporting");
     }
   };
 

@@ -165,14 +165,22 @@ export default function CreateQuotation() {
       const el = quotRef.current;
       if (!el) return;
       const name = (customer?.name || "Customer").replace(/[^a-zA-Z0-9]/g, "");
+
+      el.classList.add("pdf-exporting");
+      
       await html2pdf().from(el).set({
         margin: [0.3, 0.35, 0.3, 0.35],
         filename: `${name}_Quotation.pdf`,
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2.2, useCORS: true, logging: false, backgroundColor: "#ffffff" },
+        html2canvas: { scale: 2.2, useCORS: true, logging: false, backgroundColor: "#ffffff", windowWidth: 1024 },
         jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
       }).save();
-    } catch (err) { console.error("PDF error:", err); }
+
+      el.classList.remove("pdf-exporting");
+    } catch (err) {
+      console.error("PDF error:", err);
+      quotRef.current?.classList.remove("pdf-exporting");
+    }
   };
 
   if (!customer) {
