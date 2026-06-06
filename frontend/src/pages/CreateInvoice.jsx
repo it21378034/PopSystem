@@ -499,7 +499,7 @@ export default function CreateInvoice() {
           </div>
 
           {/* Table Container */}
-          <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+          <div className="relative overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
             {/* Rubber Stamp Seal centered inside the Table */}
             {sealType !== "none" && (
               sealType === "estimate" ? (

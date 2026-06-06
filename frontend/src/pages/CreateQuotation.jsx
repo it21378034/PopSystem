@@ -352,7 +352,7 @@ export default function CreateQuotation() {
                 </button>
               )}
             </div>
-            <div className="rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+            <div className="rounded-lg border border-slate-200 overflow-x-auto shadow-sm">
               <table className="w-full text-xs border-collapse">
                 <thead>
                   <tr className="bg-indigo-50 text-slate-700">
@@ -441,7 +441,7 @@ export default function CreateQuotation() {
                 </button>
               )}
             </div>
-            <div className="rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+            <div className="rounded-lg border border-slate-200 overflow-x-auto shadow-sm">
               <table className="w-full text-xs border-collapse">
                 <thead>
                   <tr className="bg-amber-50 text-slate-700">
@@ -511,7 +511,7 @@ export default function CreateQuotation() {
                 </button>
               )}
             </div>
-            <div className="rounded-lg border border-slate-200 overflow-hidden shadow-sm">
+            <div className="rounded-lg border border-slate-200 overflow-x-auto shadow-sm">
               <table className="w-full text-xs border-collapse">
                 <thead>
                   <tr className="bg-teal-50 text-slate-700">
