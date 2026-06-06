@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: vasantha-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  backend:
+    build: ./backend
+    container_name: vasantha-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build: ./frontend
+    container_name: vasantha-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  db_data:

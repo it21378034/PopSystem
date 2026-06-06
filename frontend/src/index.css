@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@media print {
+  /* Force backgrounds and colors to show up in print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide browser header/footer page numbers and URLs */
+  @page {
+    margin: 0;
+  }
+
+  body {
+    margin: 0;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  /* Hide headers, navigation bars, and buttons */
+  header, nav, .print\:hidden {
+    display: none !important;
+  }
+
+  /* Make sure main content doesn't have default page padding/margins */
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Make the invoice card print perfectly page-sized */
+  #invoice-print-area {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 1.2cm !important;
+    background-color: #ffffff !important;
+  }
+}
