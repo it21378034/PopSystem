@@ -4,7 +4,7 @@ import { SunIcon, MoonIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/out
 import { ThemeContext } from "../context/ThemeContext";
 
 const navLinks = [
-  { to: "/", label: "Dashboard" },
+  { to: "/dashboard", label: "Dashboard" },
   { to: "/customers", label: "Customers" },
   { to: "/invoices", label: "Invoices" },
 ];
