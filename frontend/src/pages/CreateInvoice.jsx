@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import api from "../services/api";
 import {
   ArrowLeftIcon,
   PlusIcon,
@@ -145,7 +146,7 @@ export default function CreateInvoice() {
     return errs;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const errs = validate();
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
@@ -154,11 +155,11 @@ export default function CreateInvoice() {
 
     // Build invoice record
     const invoiceRecord = {
-      id: invoiceNo,
       invoiceNo,
       invoiceDate,
       sealType,
       customer: {
+        id: customer.id,
         name: customer.name,
         phone: customer.phone,
         address: customer.address,
@@ -169,25 +170,19 @@ export default function CreateInvoice() {
       notes,
       subtotal,
       grandTotal,
-      savedAt: new Date().toISOString(),
     };
 
-    // Persist to localStorage
+    // Persist to database
     try {
-      const existing = JSON.parse(localStorage.getItem("pos_invoices") || "[]");
-      // Replace if same invoice number already saved, otherwise prepend
-      const idx = existing.findIndex((inv) => inv.invoiceNo === invoiceNo);
-      if (idx !== -1) {
-        existing[idx] = invoiceRecord;
+      if (existingInvoice) {
+        await api.updateInvoice(invoiceNo, invoiceRecord);
       } else {
-        existing.unshift(invoiceRecord);
+        await api.createInvoice(invoiceRecord);
       }
-      localStorage.setItem("pos_invoices", JSON.stringify(existing));
+      setSaved(true);
     } catch (e) {
-      console.error("Failed to save invoice to localStorage", e);
+      console.error("Failed to save invoice to database", e);
     }
-
-    setSaved(true);
   };
 
   const handlePrint = () => {

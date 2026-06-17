@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 import {
   DocumentTextIcon,
   TrashIcon,
@@ -54,14 +55,18 @@ export default function Invoices() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
+    loadInvoices();
+  }, []);
+
+  const loadInvoices = async () => {
     try {
-      const stored = JSON.parse(localStorage.getItem("pos_invoices") || "[]");
-      setInvoices(stored);
+      const data = await api.getInvoices();
+      setInvoices(data);
     } catch (e) {
       console.error("Failed to load invoices:", e);
       setInvoices([]);
     }
-  }, []);
+  };
 
   const [deleteTarget, setDeleteTarget] = useState(null);
 
@@ -69,12 +74,15 @@ export default function Invoices() {
     setDeleteTarget(invoiceNo);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!deleteTarget) return;
-    const updated = invoices.filter((inv) => inv.invoiceNo !== deleteTarget);
-    setInvoices(updated);
-    localStorage.setItem("pos_invoices", JSON.stringify(updated));
-    setDeleteTarget(null);
+    try {
+      await api.deleteInvoice(deleteTarget);
+      setInvoices((prev) => prev.filter((inv) => inv.invoiceNo !== deleteTarget));
+      setDeleteTarget(null);
+    } catch (err) {
+      console.error("Failed to delete invoice:", err);
+    }
   };
 
   const handleOpen = (inv) => {

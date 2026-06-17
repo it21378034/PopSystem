@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 import {
   DocumentTextIcon,
   TrashIcon,
@@ -48,14 +49,18 @@ export default function Quotations() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
+    loadQuotations();
+  }, []);
+
+  const loadQuotations = async () => {
     try {
-      const stored = JSON.parse(localStorage.getItem("pos_quotations") || "[]");
-      setQuotations(stored);
+      const data = await api.getQuotations();
+      setQuotations(data);
     } catch (e) {
       console.error("Failed to load quotations:", e);
       setQuotations([]);
     }
-  }, []);
+  };
 
   const [deleteTarget, setDeleteTarget] = useState(null);
 
@@ -63,12 +68,15 @@ export default function Quotations() {
     setDeleteTarget(quotNo);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!deleteTarget) return;
-    const updated = quotations.filter(q => q.quotNo !== deleteTarget);
-    setQuotations(updated);
-    localStorage.setItem("pos_quotations", JSON.stringify(updated));
-    setDeleteTarget(null);
+    try {
+      await api.deleteQuotation(deleteTarget);
+      setQuotations(prev => prev.filter(q => q.quotNo !== deleteTarget));
+      setDeleteTarget(null);
+    } catch (err) {
+      console.error("Failed to delete quotation:", err);
+    }
   };
 
   const handleOpen = (quot) => {

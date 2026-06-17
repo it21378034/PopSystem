@@ -13,6 +13,7 @@ import {
   ClipboardDocumentListIcon,
 } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 const CONTRACT_TYPES = [
   { id: "gate", label: "Gate", icon: "🚪", color: "from-blue-500 to-blue-600" },
@@ -38,23 +39,24 @@ export default function Customers() {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
-  const [customers, setCustomers] = useState(() => {
-    const saved = localStorage.getItem("pos_customers");
-    try {
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      console.error("Failed to parse customers from localStorage", e);
-      return [];
-    }
-  });
-
-  useEffect(() => {
-    localStorage.setItem("pos_customers", JSON.stringify(customers));
-  }, [customers]);
-
+  const [customers, setCustomers] = useState([]);
   const [search, setSearch] = useState("");
   const [errors, setErrors] = useState({});
-  const [editingIndex, setEditingIndex] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+
+  useEffect(() => {
+    loadCustomers();
+  }, []);
+
+  const loadCustomers = async () => {
+    try {
+      const data = await api.getCustomers();
+      setCustomers(data);
+    } catch (err) {
+      console.error("Failed to load customers:", err);
+    }
+  };
 
   const toggleContract = (id) => {
     setForm((prev) => ({
@@ -77,7 +79,7 @@ export default function Customers() {
     return errs;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length > 0) {
@@ -85,23 +87,27 @@ export default function Customers() {
       return;
     }
 
-    const savedCustomer = { ...form };
-
-    if (editingIndex !== null) {
-      setCustomers((prev) =>
-        prev.map((c, i) => (i === editingIndex ? savedCustomer : c))
-      );
-      setEditingIndex(null);
-      setForm(EMPTY_FORM);
-      setErrors({});
-      setShowForm(false);
-    } else {
-      setCustomers((prev) => [...prev, savedCustomer]);
-      setForm(EMPTY_FORM);
-      setErrors({});
-      setShowForm(false);
-      // Auto-navigate to create invoice for this new customer
-      navigate("/invoices/create", { state: { customer: savedCustomer } });
+    try {
+      if (editingId !== null) {
+        const updated = await api.updateCustomer(editingId, form);
+        setCustomers((prev) =>
+          prev.map((c) => (c.id === editingId ? updated : c))
+        );
+        setEditingId(null);
+        setForm(EMPTY_FORM);
+        setErrors({});
+        setShowForm(false);
+      } else {
+        const created = await api.createCustomer(form);
+        setCustomers((prev) => [created, ...prev]);
+        setForm(EMPTY_FORM);
+        setErrors({});
+        setShowForm(false);
+        // Auto-navigate to create invoice for this new customer
+        navigate("/invoices/create", { state: { customer: created } });
+      }
+    } catch (err) {
+      console.error("Failed to save customer:", err);
     }
   };
 
@@ -113,29 +119,32 @@ export default function Customers() {
     navigate("/quotations/create", { state: { customer } });
   };
 
-  const handleEdit = (idx) => {
-    setForm({ ...customers[idx] });
-    setEditingIndex(idx);
+  const handleEdit = (customer) => {
+    setForm({ ...customer });
+    setEditingId(customer.id);
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const [deleteTarget, setDeleteTarget] = useState(null);
-
-  const handleDeleteClick = (idx) => {
-    setDeleteTarget(idx);
+  const handleDeleteClick = (customer) => {
+    setDeleteTarget(customer);
   };
 
-  const confirmDelete = () => {
-    if (deleteTarget === null) return;
-    setCustomers((prev) => prev.filter((_, i) => i !== deleteTarget));
-    setDeleteTarget(null);
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await api.deleteCustomer(deleteTarget.id);
+      setCustomers((prev) => prev.filter((c) => c.id !== deleteTarget.id));
+      setDeleteTarget(null);
+    } catch (err) {
+      console.error("Failed to delete customer:", err);
+    }
   };
 
   const handleCancel = () => {
     setForm(EMPTY_FORM);
     setErrors({});
-    setEditingIndex(null);
+    setEditingId(null);
     setShowForm(false);
   };
 
@@ -158,7 +167,7 @@ export default function Customers() {
         </div>
         <button
           id="add-customer-btn"
-          onClick={() => { setShowForm(true); setEditingIndex(null); setForm(EMPTY_FORM); }}
+          onClick={() => { setShowForm(true); setEditingId(null); setForm(EMPTY_FORM); }}
           className="flex items-center gap-2 bg-gradient-to-r from-blue-900 to-blue-700 hover:from-blue-800 hover:to-blue-600 text-white font-semibold px-5 py-2.5 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105"
         >
           <UserPlusIcon className="h-5 w-5" />
@@ -173,7 +182,7 @@ export default function Customers() {
           <div className="bg-gradient-to-r from-blue-900 to-blue-700 px-6 py-4 flex items-center justify-between">
             <h3 className="text-xl font-bold text-white flex items-center gap-2">
               <UserPlusIcon className="h-6 w-6" />
-              {editingIndex !== null ? "Edit Customer" : "New Customer"}
+              {editingId !== null ? "Edit Customer" : "New Customer"}
             </h3>
             <button
               onClick={handleCancel}
@@ -334,7 +343,7 @@ export default function Customers() {
             </div>
 
             {/* Info banner for new customers */}
-            {editingIndex === null && (
+            {editingId === null && (
               <div className="flex items-start gap-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg px-4 py-3">
                 <DocumentTextIcon className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-blue-700 dark:text-blue-300">
@@ -351,7 +360,7 @@ export default function Customers() {
                 className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-900 to-blue-700 hover:from-blue-800 hover:to-blue-600 text-white font-semibold py-3 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105"
               >
                 <CheckIcon className="h-5 w-5" />
-                {editingIndex !== null ? "Update Customer" : "Save & Create Invoice"}
+                {editingId !== null ? "Update Customer" : "Save & Create Invoice"}
               </button>
               <button
                 type="button"
@@ -420,7 +429,7 @@ export default function Customers() {
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                 {filtered.map((customer, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150">
+                  <tr key={customer.id || idx} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150">
                     <td className="px-6 py-4 text-gray-400 dark:text-gray-500 font-mono text-xs">
                       {String(idx + 1).padStart(3, "0")}
                     </td>
@@ -475,14 +484,14 @@ export default function Customers() {
                           <ClipboardDocumentListIcon className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={() => handleEdit(idx)}
+                          onClick={() => handleEdit(customer)}
                           className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition"
                           title="Edit customer"
                         >
                           <PencilSquareIcon className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={() => handleDeleteClick(idx)}
+                          onClick={() => handleDeleteClick(customer)}
                           className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition"
                           title="Delete customer"
                         >
@@ -507,7 +516,7 @@ export default function Customers() {
               <h3 className="text-lg font-bold text-gray-900 dark:text-white">Delete Customer?</h3>
             </div>
             <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
-              Are you sure you want to delete customer <span className="font-bold text-gray-800 dark:text-white">{customers[deleteTarget]?.name}</span>? This action cannot be undone.
+              Are you sure you want to delete customer <span className="font-bold text-gray-800 dark:text-white">{deleteTarget?.name}</span>? This action cannot be undone.
             </p>
             <div className="flex gap-3 justify-end">
               <button

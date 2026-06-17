@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import api from "../services/api";
 import {
   ArrowLeftIcon,
   PlusIcon,
@@ -150,27 +151,27 @@ export default function CreateQuotation() {
     return errs;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
 
     const record = {
-      id: quotNo, quotNo, quotDate, validUntil, projectName, siteLocation, startDate,
-      customer: { name: customer.name, phone: customer.phone, address: customer.address, contracts: customer.contracts, otherDetails: customer.otherDetails || "" },
+      quotNo, quotDate, validUntil, projectName, siteLocation, startDate,
+      customer: { id: customer.id, name: customer.name, phone: customer.phone, address: customer.address, contracts: customer.contracts, otherDetails: customer.otherDetails || "" },
       materials, labours, extras, discount, paymentTerms, tcLines, notes,
       materialTotal, labourTotal, extraTotal, subtotal, discountAmt, grandTotal,
-      savedAt: new Date().toISOString(),
     };
 
     try {
-      const existing = JSON.parse(localStorage.getItem("pos_quotations") || "[]");
-      const idx = existing.findIndex(q => q.quotNo === quotNo);
-      if (idx !== -1) existing[idx] = record;
-      else existing.unshift(record);
-      localStorage.setItem("pos_quotations", JSON.stringify(existing));
-    } catch (e) { console.error("Failed to save quotation", e); }
-
-    setSaved(true);
+      if (existing) {
+        await api.updateQuotation(quotNo, record);
+      } else {
+        await api.createQuotation(record);
+      }
+      setSaved(true);
+    } catch (e) {
+      console.error("Failed to save quotation:", e);
+    }
   };
 
   const handlePrint = () => window.print();

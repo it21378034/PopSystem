@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 import {
   UserIcon,
   DocumentTextIcon,
@@ -25,13 +26,17 @@ export default function Dashboard() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem("pos_customers") || "[]");
-      setCustomers(stored);
-    } catch (e) {
-      setCustomers([]);
-    }
+    loadCustomers();
   }, []);
+
+  const loadCustomers = async () => {
+    try {
+      const data = await api.getCustomers();
+      setCustomers(data);
+    } catch (err) {
+      console.error("Failed to load customers:", err);
+    }
+  };
 
   const filtered = customers.filter(
     (c) =>
@@ -113,7 +118,7 @@ export default function Dashboard() {
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                 {filtered.map((customer, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150">
+                  <tr key={customer.id || idx} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150">
                     <td className="px-6 py-4 text-gray-400 dark:text-gray-500 font-mono text-xs">
                       {String(idx + 1).padStart(3, "0")}
                     </td>
