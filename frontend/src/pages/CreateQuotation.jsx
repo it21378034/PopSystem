@@ -88,13 +88,27 @@ export default function CreateQuotation() {
   const materialTotal = materials.reduce((s, m) => {
     const q = parseFloat(m.qty);
     const r = parseFloat(m.unitRate) || 0;
-    const rowTotal = !isNaN(q) && q !== 0 ? q * r : r;
+    let rowTotal;
+    if (!isNaN(q) && q !== 0) {
+      rowTotal = q * r;           // qty entered → multiply
+    } else if (isNaN(q) && r > 0) {
+      rowTotal = r;               // qty empty but price entered → show price
+    } else {
+      rowTotal = 0;               // both empty → 0
+    }
     return s + rowTotal;
   }, 0);
   const labourTotal = labours.reduce((s, l) => {
     const d = parseFloat(l.days);
     const r = parseFloat(l.ratePerDay) || 0;
-    const rowTotal = !isNaN(d) && d !== 0 ? d * r : r;
+    let rowTotal;
+    if (!isNaN(d) && d !== 0) {
+      rowTotal = d * r;
+    } else if (isNaN(d) && r > 0) {
+      rowTotal = r;
+    } else {
+      rowTotal = 0;
+    }
     return s + rowTotal;
   }, 0);
   const extraTotal = extras.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
@@ -376,7 +390,14 @@ export default function CreateQuotation() {
                   {materials.map((m, idx) => {
                     const qty = parseFloat(m.qty);
                     const rate = parseFloat(m.unitRate) || 0;
-                    const total = !isNaN(qty) && qty !== 0 ? qty * rate : rate;
+                    let total;
+                    if (!isNaN(qty) && qty !== 0) {
+                      total = qty * rate;       // qty entered → multiply
+                    } else if (isNaN(qty) && rate > 0) {
+                      total = rate;             // qty empty, price entered → show price
+                    } else {
+                      total = 0;               // both empty → 0
+                    }
                     return (
                       <tr key={idx} className="hover:bg-slate-50/50">
                         <td className="px-3 py-2 border-r border-slate-100">
@@ -465,7 +486,14 @@ export default function CreateQuotation() {
                   {labours.map((l, idx) => {
                     const days = parseFloat(l.days);
                     const rate = parseFloat(l.ratePerDay) || 0;
-                    const total = !isNaN(days) && days !== 0 ? days * rate : rate;
+                    let total;
+                    if (!isNaN(days) && days !== 0) {
+                      total = days * rate;
+                    } else if (isNaN(days) && rate > 0) {
+                      total = rate;
+                    } else {
+                      total = 0;
+                    }
                     return (
                       <tr key={idx} className="hover:bg-slate-50/50">
                         <td className="px-3 py-2 border-r border-slate-100">
