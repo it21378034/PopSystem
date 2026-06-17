@@ -6,6 +6,7 @@ import { ThemeContext } from "../context/ThemeContext";
 const navLinks = [
   { to: "/dashboard", label: "Dashboard" },
   { to: "/customers", label: "Customers" },
+  { to: "/quotations/create", label: "Quotation" },
   { to: "/invoices", label: "Invoices" },
 ];
 
