@@ -86,14 +86,16 @@ export default function CreateQuotation() {
 
   // — Totals —
   const materialTotal = materials.reduce((s, m) => {
-    const q = parseFloat(m.qty) || 0;
+    const q = parseFloat(m.qty);
     const r = parseFloat(m.unitRate) || 0;
-    return s + q * r;
+    const rowTotal = !isNaN(q) && q !== 0 ? q * r : r;
+    return s + rowTotal;
   }, 0);
   const labourTotal = labours.reduce((s, l) => {
-    const d = parseFloat(l.days) || 0;
+    const d = parseFloat(l.days);
     const r = parseFloat(l.ratePerDay) || 0;
-    return s + d * r;
+    const rowTotal = !isNaN(d) && d !== 0 ? d * r : r;
+    return s + rowTotal;
   }, 0);
   const extraTotal = extras.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
   const subtotal = materialTotal + labourTotal + extraTotal;
@@ -372,7 +374,9 @@ export default function CreateQuotation() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {materials.map((m, idx) => {
-                    const total = (parseFloat(m.qty) || 0) * (parseFloat(m.unitRate) || 0);
+                    const qty = parseFloat(m.qty);
+                    const rate = parseFloat(m.unitRate) || 0;
+                    const total = !isNaN(qty) && qty !== 0 ? qty * rate : rate;
                     return (
                       <tr key={idx} className="hover:bg-slate-50/50">
                         <td className="px-3 py-2 border-r border-slate-100">
@@ -459,7 +463,9 @@ export default function CreateQuotation() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {labours.map((l, idx) => {
-                    const total = (parseFloat(l.days) || 0) * (parseFloat(l.ratePerDay) || 0);
+                    const days = parseFloat(l.days);
+                    const rate = parseFloat(l.ratePerDay) || 0;
+                    const total = !isNaN(days) && days !== 0 ? days * rate : rate;
                     return (
                       <tr key={idx} className="hover:bg-slate-50/50">
                         <td className="px-3 py-2 border-r border-slate-100">
