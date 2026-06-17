@@ -44,6 +44,7 @@ export default function Customers() {
   const [errors, setErrors] = useState({});
   const [editingId, setEditingId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [postSaveDialog, setPostSaveDialog] = useState(null);
 
   useEffect(() => {
     loadCustomers();
@@ -103,8 +104,7 @@ export default function Customers() {
         setForm(EMPTY_FORM);
         setErrors({});
         setShowForm(false);
-        // Auto-navigate to create invoice for this new customer
-        navigate("/invoices/create", { state: { customer: created } });
+        setPostSaveDialog(created);
       }
     } catch (err) {
       console.error("Failed to save customer:", err);
@@ -157,8 +157,9 @@ export default function Customers() {
   );
 
   return (
-    <section className="space-y-6 max-w-7xl mx-auto">
-      {/* Page Header */}
+    <>
+      <section className="space-y-6 max-w-7xl mx-auto">
+        {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Customers</h2>
@@ -343,15 +344,7 @@ export default function Customers() {
               />
             </div>
 
-            {/* Info banner for new customers */}
-            {editingId === null && (
-              <div className="flex items-start gap-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg px-4 py-3">
-                <DocumentTextIcon className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-blue-700 dark:text-blue-300">
-                  After saving, you'll be automatically taken to create an invoice for this customer.
-                </p>
-              </div>
-            )}
+            {/* Info banner for new customers removed */}
 
             {/* Form Actions */}
             <div className="flex flex-col sm:flex-row gap-3 pt-2 border-t border-gray-100 dark:border-gray-700">
@@ -361,7 +354,7 @@ export default function Customers() {
                 className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-900 to-blue-700 hover:from-blue-800 hover:to-blue-600 text-white font-semibold py-3 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105"
               >
                 <CheckIcon className="h-5 w-5" />
-                {editingId !== null ? "Update Customer" : "Save & Create Invoice"}
+                {editingId !== null ? "Update Customer" : "Save"}
               </button>
               <button
                 type="button"
@@ -537,5 +530,43 @@ export default function Customers() {
         </div>
       )}
     </section>
+
+      {/* Post Save Action Modal */}
+      {postSaveDialog !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-sm p-6 transform transition-all">
+            <div className="flex items-center gap-3 text-blue-600 mb-4">
+              <CheckIcon className="h-6 w-6" />
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Customer Saved!</h3>
+            </div>
+            <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
+              Do you want to create an Invoice or Quotation for <span className="font-bold text-gray-800 dark:text-white">{postSaveDialog?.name}</span>?
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => handleCreateInvoice(postSaveDialog)}
+                className="flex-1 px-4 py-2 flex justify-center items-center gap-2 rounded-lg text-sm font-semibold text-white bg-green-600 hover:bg-green-700 transition"
+              >
+                <DocumentTextIcon className="h-4 w-4" /> Invoice
+              </button>
+              <button
+                onClick={() => handleCreateQuotation(postSaveDialog)}
+                className="flex-1 px-4 py-2 flex justify-center items-center gap-2 rounded-lg text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition"
+              >
+                <ClipboardDocumentListIcon className="h-4 w-4" /> Quotation
+              </button>
+            </div>
+            <div className="mt-4 text-center">
+              <button
+                onClick={() => setPostSaveDialog(null)}
+                className="text-sm font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                No, maybe later
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
