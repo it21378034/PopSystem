@@ -1,4 +1,5 @@
 const { Sequelize } = require('sequelize');
+require('mysql2'); // Explicitly require mysql2 for Vercel bundler
 require('dotenv').config();
 
 const sequelize = new Sequelize(
@@ -12,7 +13,7 @@ const sequelize = new Sequelize(
     logging: false, // Turn off logging for a cleaner console output in dev
     dialectOptions: {
       ssl: process.env.DB_SSL === 'true' ? {
-        rejectUnauthorized: true,
+        rejectUnauthorized: false, // Skip CA cert validation for cloud DBs without custom CA
       } : false
     }
   }

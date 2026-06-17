@@ -108,6 +108,7 @@ export default function Customers() {
       }
     } catch (err) {
       console.error("Failed to save customer:", err);
+      alert("Error saving customer. Please check your connection or database configuration.");
     }
   };
 
