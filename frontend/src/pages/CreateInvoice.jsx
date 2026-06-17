@@ -90,8 +90,13 @@ export default function CreateInvoice() {
     if (item.priceType === "liters") {
       return p;
     }
-    const q = parseFloat(item.qty) || 0;
-    return q * p;
+    const q = parseFloat(item.qty);
+    if (!isNaN(q) && q !== 0) {
+      return q * p;       // qty entered → multiply
+    } else if ((isNaN(q) || q === 0) && p > 0) {
+      return p;           // qty empty but price entered → show price
+    }
+    return 0;             // both empty → 0
   };
 
   const subtotal = items.reduce((sum, item) => sum + lineTotal(item), 0);
@@ -125,16 +130,14 @@ export default function CreateInvoice() {
     const errs = {};
     items.forEach((item, idx) => {
       if (!item.description.trim()) errs[`item_${idx}_description`] = "Required";
-      
-      if (item.priceType === "unit") {
-        if (!item.qty || isNaN(parseFloat(item.qty)) || parseFloat(item.qty) <= 0) {
-          errs[`item_${idx}_qty`] = "Invalid";
-        }
-      } else {
+
+      // qty is optional — only validate if priceType is liters and qty is blank
+      if (item.priceType === "liters") {
         if (!item.qty || !item.qty.trim()) {
           errs[`item_${idx}_qty`] = "Required";
         }
       }
+      // For "unit" priceType, qty can be empty (unit price will be used as total)
 
       if (!item.unitPrice || isNaN(parseFloat(item.unitPrice)) || parseFloat(item.unitPrice) < 0)
         errs[`item_${idx}_unitPrice`] = "Invalid";
