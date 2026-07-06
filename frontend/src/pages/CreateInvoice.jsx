@@ -10,6 +10,7 @@ import {
   CheckCircleIcon,
   PencilSquareIcon,
   ListBulletIcon,
+  ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
 
 const CONTRACT_TYPES = {
@@ -341,6 +342,13 @@ export default function CreateInvoice() {
               >
                 <PrinterIcon className="h-4 w-4" />
                 Print
+              </button>
+              <button
+                onClick={handleGeneratePDF}
+                className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold px-3 py-2 rounded-lg text-sm transition"
+              >
+                <ArrowDownTrayIcon className="h-4 w-4" />
+                Download PDF
               </button>
               <button
                 onClick={() => setSaved(false)}
