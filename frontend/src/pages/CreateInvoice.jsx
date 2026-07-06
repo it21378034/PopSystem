@@ -91,7 +91,7 @@ export default function CreateInvoice() {
 
   const lineTotal = (item) => {
     const p = parseFloat(item.unitPrice) || 0;
-    if (item.priceType === "liters") {
+    if (item.priceType === "liters" || item.priceType === "text") {
       return p;
     }
     const q = parseFloat(item.qty);
@@ -629,6 +629,7 @@ export default function CreateInvoice() {
                             >
                               <option value="unit">Unit</option>
                               <option value="liters">Liters</option>
+                              <option value="text">Text</option>
                             </select>
                             {errors[`item_${idx}_qty`] && (
                               <span className="text-[9px] text-red-500 block">Invalid</span>
