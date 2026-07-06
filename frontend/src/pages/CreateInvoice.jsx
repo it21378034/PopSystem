@@ -68,6 +68,9 @@ export default function CreateInvoice() {
   const [sealType, setSealType] = useState(() =>
     existingInvoice ? existingInvoice.sealType : "none"
   );
+  const [showTotals, setShowTotals] = useState(() =>
+    existingInvoice ? existingInvoice.showTotals !== false : true
+  );
 
   // Auto-initialize first item's category with the customer's contract type on load
   useEffect(() => {
@@ -158,6 +161,7 @@ export default function CreateInvoice() {
       invoiceNo,
       invoiceDate,
       sealType,
+      showTotals,
       customer: {
         id: customer.id,
         name: customer.name,
@@ -294,6 +298,30 @@ export default function CreateInvoice() {
               }`}
             >
               Pay
+            </button>
+          </div>
+
+          {/* Show Totals Option Selector */}
+          <div className="flex bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-inner mr-1">
+            <button
+              onClick={() => setShowTotals(true)}
+              className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all duration-200 ${
+                showTotals
+                  ? "bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 shadow-sm"
+                  : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+              }`}
+            >
+              Show Totals
+            </button>
+            <button
+              onClick={() => setShowTotals(false)}
+              className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all duration-200 ${
+                !showTotals
+                  ? "bg-white dark:bg-slate-700 text-rose-600 dark:text-rose-400 shadow-sm"
+                  : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
+              }`}
+            >
+              Hide Totals
             </button>
           </div>
 
@@ -519,12 +547,14 @@ export default function CreateInvoice() {
                   <th className="px-3 py-2 text-right font-bold uppercase tracking-wider w-[12%] border-r border-blue-100">
                     Quantity
                   </th>
-                  <th className="px-3 py-2 text-right font-bold uppercase tracking-wider w-[18%] border-r border-blue-100">
+                  <th className={`px-3 py-2 text-right font-bold uppercase tracking-wider w-[18%] ${showTotals ? "border-r border-blue-100" : ""}`}>
                     Unit Price (RS)
                   </th>
-                  <th className="px-3 py-2 text-right font-bold uppercase tracking-wider w-[24%]">
-                    Total (RS)
-                  </th>
+                  {showTotals && (
+                    <th className="px-3 py-2 text-right font-bold uppercase tracking-wider w-[24%]">
+                      Total (RS)
+                    </th>
+                  )}
                   {!saved && <th className="px-2 py-2 w-10 animate-fade-in"></th>}
                 </tr>
               </thead>
@@ -608,7 +638,7 @@ export default function CreateInvoice() {
                       </td>
 
                       {/* Unit Price (RS) */}
-                      <td className="px-3 py-2 text-right border-r border-slate-100 align-top font-mono text-slate-800">
+                      <td className={`px-3 py-2 text-right align-top font-mono text-slate-800 ${showTotals ? "border-r border-slate-100" : ""}`}>
                         {saved ? (
                           <span>RS {fmt(item.unitPrice)}</span>
                         ) : (
@@ -632,9 +662,11 @@ export default function CreateInvoice() {
                       </td>
 
                       {/* Total (RS) */}
-                      <td className="px-3 py-2 text-right align-top font-mono text-slate-800 font-bold whitespace-nowrap">
-                        <span>RS {fmt(lineTotal(item))}</span>
-                      </td>
+                      {showTotals && (
+                        <td className="px-3 py-2 text-right align-top font-mono text-slate-800 font-bold whitespace-nowrap">
+                          <span>RS {fmt(lineTotal(item))}</span>
+                        </td>
+                      )}
 
                       {/* Remove Button */}
                       {!saved && (
@@ -654,15 +686,17 @@ export default function CreateInvoice() {
                 })}
 
                 {/* Total Estimate Highlight Row - Styled in highly professional Slate highlight */}
-                <tr className="bg-blue-50 font-bold text-slate-700 text-sm">
-                  <td colSpan={4} className="px-3 py-3 border-r border-slate-200">
-                    Total Estimate:
-                  </td>
-                  <td className="px-3 py-3 text-right font-mono text-base whitespace-nowrap">
-                    RS {fmt(grandTotal)}
-                  </td>
-                  {!saved && <td className="px-2 py-3"></td>}
-                </tr>
+                {showTotals && (
+                  <tr className="bg-blue-50 font-bold text-slate-700 text-sm">
+                    <td colSpan={4} className="px-3 py-3 border-r border-slate-200">
+                      Total Estimate:
+                    </td>
+                    <td className="px-3 py-3 text-right font-mono text-base whitespace-nowrap">
+                      RS {fmt(grandTotal)}
+                    </td>
+                    {!saved && <td className="px-2 py-3"></td>}
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

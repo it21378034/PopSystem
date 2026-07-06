@@ -23,7 +23,7 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const {
-      invoiceNo, invoiceDate, sealType, items, notes, subtotal, grandTotal
+      invoiceNo, invoiceDate, sealType, items, notes, subtotal, grandTotal, showTotals
     } = req.body;
 
     const customerId = req.body.customerId || req.body.customer?.id;
@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
     }
 
     const invoice = await Invoice.create({
-      invoiceNo, invoiceDate, sealType, items, notes, subtotal, grandTotal,
+      invoiceNo, invoiceDate, sealType, items, notes, subtotal, grandTotal, showTotals,
       customerId
     });
 
@@ -52,7 +52,7 @@ router.put('/:invoiceNo', async (req, res) => {
   try {
     const { invoiceNo } = req.params;
     const {
-      invoiceDate, sealType, items, notes, subtotal, grandTotal
+      invoiceDate, sealType, items, notes, subtotal, grandTotal, showTotals
     } = req.body;
 
     const invoice = await Invoice.findByPk(invoiceNo);
@@ -63,7 +63,7 @@ router.put('/:invoiceNo', async (req, res) => {
     const customerId = req.body.customerId || req.body.customer?.id || invoice.customerId;
 
     await invoice.update({
-      invoiceDate, sealType, items, notes, subtotal, grandTotal,
+      invoiceDate, sealType, items, notes, subtotal, grandTotal, showTotals,
       customerId
     });
 

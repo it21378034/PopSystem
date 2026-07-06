@@ -37,6 +37,11 @@ const Invoice = sequelize.define('Invoice', {
   customerId: {
     type: DataTypes.INTEGER,
     allowNull: false
+  },
+  showTotals: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true
   }
 }, {
   timestamps: true
