@@ -241,15 +241,14 @@ export default function CreateQuotation() {
               <button onClick={() => setSaved(false)} className="flex items-center gap-1.5 bg-amber-100 dark:bg-amber-900/30 hover:bg-amber-200 text-amber-700 dark:text-amber-400 font-semibold px-3 py-2 rounded-lg text-sm transition border border-amber-200 dark:border-amber-700">
                 <PencilSquareIcon className="h-4 w-4" /> Edit
               </button>
+              <button onClick={handlePrint} className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold px-3 py-2 rounded-lg text-sm transition">
+                <PrinterIcon className="h-4 w-4" /> Print
+              </button>
+              <button onClick={handleGeneratePDF} className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold px-3 py-2 rounded-lg text-sm transition">
+                <ArrowDownTrayIcon className="h-4 w-4" /> Download PDF
+              </button>
             </>
           )}
-          
-          <button onClick={handlePrint} className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold px-3 py-2 rounded-lg text-sm transition">
-            <PrinterIcon className="h-4 w-4" /> Print
-          </button>
-          <button onClick={handleGeneratePDF} className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold px-3 py-2 rounded-lg text-sm transition">
-            <ArrowDownTrayIcon className="h-4 w-4" /> Download PDF
-          </button>
 
           {!saved && (
             <button onClick={handleSave} className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-800 to-indigo-950 hover:from-indigo-700 hover:to-indigo-900 text-white font-semibold px-4 py-2 rounded-lg text-sm shadow transition">
@@ -375,7 +374,7 @@ export default function CreateQuotation() {
                 <WrenchScrewdriverIcon className="h-3.5 w-3.5" /> Materials & Items
               </h3>
               {!saved && (
-                <button onClick={addMat} className="flex items-center gap-0.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition">
+                <button onClick={addMat} className="flex items-center gap-0.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition print:hidden">
                   <PlusIcon className="h-3.5 w-3.5" /> Add Row
                 </button>
               )}
@@ -390,7 +389,7 @@ export default function CreateQuotation() {
                     <th className="px-3 py-2 text-center font-bold uppercase tracking-wider border-r border-indigo-100 w-[8%]">Unit</th>
                     <th className="px-3 py-2 text-right font-bold uppercase tracking-wider border-r border-indigo-100 w-[14%]">Rate (RS)</th>
                     <th className="px-3 py-2 text-right font-bold uppercase tracking-wider w-[14%]">Total (RS)</th>
-                    {!saved && <th className="px-2 py-2 w-8"></th>}
+                    {!saved && <th className="px-2 py-2 w-8 print:hidden"></th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -448,7 +447,7 @@ export default function CreateQuotation() {
                         </td>
                         <td className="px-3 py-2 text-right font-mono font-bold text-slate-800">RS {fmt(total)}</td>
                         {!saved && (
-                          <td className="px-1 py-2 text-center">
+                          <td className="px-1 py-2 text-center print:hidden">
                             <button onClick={() => removeMat(idx)} disabled={materials.length === 1} className="text-red-400 hover:text-red-600 transition">
                               <TrashIcon className="h-3.5 w-3.5" />
                             </button>
@@ -473,7 +472,7 @@ export default function CreateQuotation() {
                 <TruckIcon className="h-3.5 w-3.5" /> Labour Charges
               </h3>
               {!saved && (
-                <button onClick={addLab} className="flex items-center gap-0.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition">
+                <button onClick={addLab} className="flex items-center gap-0.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition print:hidden">
                   <PlusIcon className="h-3.5 w-3.5" /> Add Row
                 </button>
               )}
@@ -486,7 +485,7 @@ export default function CreateQuotation() {
                     <th className="px-3 py-2 text-right font-bold uppercase tracking-wider border-r border-amber-100 w-[14%]">Days / Hours</th>
                     <th className="px-3 py-2 text-right font-bold uppercase tracking-wider border-r border-amber-100 w-[18%]">Rate / Day (RS)</th>
                     <th className="px-3 py-2 text-right font-bold uppercase tracking-wider w-[16%]">Total (RS)</th>
-                    {!saved && <th className="px-2 py-2 w-8"></th>}
+                    {!saved && <th className="px-2 py-2 w-8 print:hidden"></th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -529,7 +528,7 @@ export default function CreateQuotation() {
                         </td>
                         <td className="px-3 py-2 text-right font-mono font-bold text-slate-800">RS {fmt(total)}</td>
                         {!saved && (
-                          <td className="px-1 py-2 text-center">
+                          <td className="px-1 py-2 text-center print:hidden">
                             <button onClick={() => removeLab(idx)} disabled={labours.length === 1} className="text-red-400 hover:text-red-600 transition">
                               <TrashIcon className="h-3.5 w-3.5" />
                             </button>
@@ -552,7 +551,7 @@ export default function CreateQuotation() {
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Additional Costs</h3>
               {!saved && (
-                <button onClick={addExt} className="flex items-center gap-0.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition">
+                <button onClick={addExt} className="flex items-center gap-0.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition print:hidden">
                   <PlusIcon className="h-3.5 w-3.5" /> Add
                 </button>
               )}
@@ -563,7 +562,7 @@ export default function CreateQuotation() {
                   <tr className="bg-teal-50 text-slate-700">
                     <th className="px-3 py-2 text-left font-bold uppercase tracking-wider border-r border-teal-100">Description</th>
                     <th className="px-3 py-2 text-right font-bold uppercase tracking-wider w-[22%]">Amount (RS)</th>
-                    {!saved && <th className="px-2 py-2 w-8"></th>}
+                    {!saved && <th className="px-2 py-2 w-8 print:hidden"></th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -584,7 +583,7 @@ export default function CreateQuotation() {
                         )}
                       </td>
                       {!saved && (
-                        <td className="px-1 py-2 text-center">
+                        <td className="px-1 py-2 text-center print:hidden">
                           <button onClick={() => removeExt(idx)} disabled={extras.length === 1} className="text-red-400 hover:text-red-600 transition">
                             <TrashIcon className="h-3.5 w-3.5" />
                           </button>
@@ -595,7 +594,7 @@ export default function CreateQuotation() {
                   <tr className="bg-teal-50/50 font-semibold text-xs">
                     <td className="px-3 py-2 text-right text-slate-600 border-t border-teal-100">Additional Subtotal:</td>
                     <td className="px-3 py-2 text-right font-mono font-bold text-slate-800 border-t border-teal-100">RS {fmt(extraTotal)}</td>
-                    {!saved && <td className="border-t border-teal-100"></td>}
+                    {!saved && <td className="border-t border-teal-100 print:hidden"></td>}
                   </tr>
                 </tbody>
               </table>

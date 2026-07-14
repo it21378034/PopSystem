@@ -32,7 +32,7 @@
   }
 
   /* Make the invoice card print perfectly page-sized */
-  #invoice-print-area, #quotation-print-area {
+  #invoice-print-area, #quotation-print-area, #item-list-print-area {
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
@@ -59,4 +59,8 @@
 
 .pdf-exporting .overflow-x-auto {
   overflow: visible !important;
+}
+
+.pdf-exporting .print\:hidden {
+  display: none !important;
 }

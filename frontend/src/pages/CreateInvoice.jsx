@@ -325,7 +325,6 @@ export default function CreateInvoice() {
               Hide Totals
             </button>
           </div>
-
           {saved && (
             <>
               <button
@@ -344,23 +343,22 @@ export default function CreateInvoice() {
                 <PencilSquareIcon className="h-4 w-4" />
                 Edit
               </button>
+              <button
+                onClick={handlePrint}
+                className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold px-3 py-2 rounded-lg text-sm transition"
+              >
+                <PrinterIcon className="h-4 w-4" />
+                Print
+              </button>
+              <button
+                onClick={handleGeneratePDF}
+                className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold px-3 py-2 rounded-lg text-sm transition"
+              >
+                <ArrowDownTrayIcon className="h-4 w-4" />
+                Download PDF
+              </button>
             </>
           )}
-
-          <button
-            onClick={handlePrint}
-            className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold px-3 py-2 rounded-lg text-sm transition"
-          >
-            <PrinterIcon className="h-4 w-4" />
-            Print
-          </button>
-          <button
-            onClick={handleGeneratePDF}
-            className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold px-3 py-2 rounded-lg text-sm transition"
-          >
-            <ArrowDownTrayIcon className="h-4 w-4" />
-            Download PDF
-          </button>
 
           {!saved && (
             <button
@@ -565,7 +563,7 @@ export default function CreateInvoice() {
                       Total (RS)
                     </th>
                   )}
-                  {!saved && <th className="px-2 py-2 w-10 animate-fade-in"></th>}
+                  {!saved && <th className="px-2 py-2 w-10 animate-fade-in print:hidden"></th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -681,7 +679,7 @@ export default function CreateInvoice() {
 
                       {/* Remove Button */}
                       {!saved && (
-                        <td className="px-1 py-2 text-center align-top">
+                        <td className="px-1 py-2 text-center align-top print:hidden">
                           <button
                             type="button"
                             onClick={() => removeItem(idx)}
@@ -705,7 +703,7 @@ export default function CreateInvoice() {
                     <td className="px-3 py-3 text-right font-mono text-base whitespace-nowrap">
                       RS {fmt(grandTotal)}
                     </td>
-                    {!saved && <td className="px-2 py-3"></td>}
+                    {!saved && <td className="px-2 py-3 print:hidden"></td>}
                   </tr>
                 )}
               </tbody>
@@ -716,7 +714,7 @@ export default function CreateInvoice() {
           {!saved && (
             <button
               onClick={addItem}
-              className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-700 hover:border-slate-400 transition flex items-center justify-center gap-1"
+              className="w-full py-2 border-2 border-dashed border-slate-200 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-700 hover:border-slate-400 transition flex items-center justify-center gap-1 print:hidden"
             >
               <PlusIcon className="h-3.5 w-3.5" />
               Add another item line
