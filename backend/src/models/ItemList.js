@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-const PackagingList = sequelize.define('PackagingList', {
+const ItemList = sequelize.define('ItemList', {
   listNo: {
     type: DataTypes.STRING,
     primaryKey: true
@@ -32,4 +32,4 @@ const PackagingList = sequelize.define('PackagingList', {
   timestamps: true
 });
 
-module.exports = PackagingList;
+module.exports = ItemList;

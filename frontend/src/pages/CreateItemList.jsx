@@ -33,10 +33,10 @@ function generateListNo() {
   const m = String(now.getMonth() + 1).padStart(2, "0");
   const d = String(now.getDate()).padStart(2, "0");
   const rand = String(Math.floor(Math.random() * 9000) + 1000);
-  return `PKG-${y}${m}${d}-${rand}`;
+  return `ITM-${y}${m}${d}-${rand}`;
 }
 
-export default function CreatePackagingList() {
+export default function CreateItemList() {
   const location = useLocation();
   const navigate = useNavigate();
   const customer = location.state?.customer || null;
@@ -137,13 +137,13 @@ export default function CreatePackagingList() {
 
     try {
       if (existingList) {
-        await api.updatePackagingList(listNo, listRecord);
+        await api.updateItemList(listNo, listRecord);
       } else {
-        await api.createPackagingList(listRecord);
+        await api.createItemList(listRecord);
       }
       setSaved(true);
     } catch (e) {
-      console.error("Failed to save packaging list to database", e);
+      console.error("Failed to save item list to database", e);
     }
   };
 
@@ -158,7 +158,7 @@ export default function CreatePackagingList() {
       if (!element) return;
 
       const cleanCustomerName = (customer?.name || "Customer").replace(/[^a-zA-Z0-9]/g, "");
-      const filename = `${cleanCustomerName}_PackagingList.pdf`;
+      const filename = `${cleanCustomerName}_ItemList.pdf`;
 
       const opt = {
         margin: [0.35, 0.4, 0.35, 0.4],
@@ -189,7 +189,7 @@ export default function CreatePackagingList() {
         <DocumentTextIcon className="h-16 w-16 text-gray-300 mx-auto" />
         <h2 className="text-2xl font-bold text-gray-700 dark:text-white">No Customer Selected</h2>
         <p className="text-gray-500 dark:text-gray-400">
-          Please go to the Customers page and select a customer to create a packaging list.
+          Please go to the Customers page and select a customer to create an item list.
         </p>
         <button
           onClick={() => navigate("/customers")}
@@ -217,7 +217,7 @@ export default function CreatePackagingList() {
           <div>
             <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-1.5">
               <DocumentTextIcon className="h-5 w-5 text-teal-600 dark:text-teal-400" />
-              Create Packaging List
+              Create Item List
             </h2>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               Draft #{listNo} · {listDate}
@@ -262,9 +262,9 @@ export default function CreatePackagingList() {
           {saved && (
             <>
               <button
-                onClick={() => navigate("/packaging-lists")}
+                onClick={() => navigate("/item-lists")}
                 className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-semibold px-3 py-2 rounded-lg text-sm transition"
-                title="View all packaging lists"
+                title="View all item lists"
               >
                 <ListBulletIcon className="h-4 w-4" />
                 All Lists
@@ -307,10 +307,10 @@ export default function CreatePackagingList() {
         </div>
       </div>
 
-      {/* Packaging List Document */}
+      {/* Item List Document */}
       <div
         ref={listRef}
-        id="packaging-list-print-area"
+        id="item-list-print-area"
         className="relative bg-white text-slate-800 rounded-xl shadow-lg border border-slate-200 overflow-hidden font-sans p-5 sm:p-6"
       >
         {/* Header Block */}
@@ -376,9 +376,9 @@ export default function CreatePackagingList() {
                 <p style={{ fontFamily: "'Montserrat', sans-serif", fontWeight: 600, fontSize: "8px", color: "#2dd4bf", letterSpacing: "2px", textTransform: "uppercase", marginTop: "4px" }}>Professional Fabrication &amp; Installation</p>
               </div>
             </div>
-            {/* Packaging List Label */}
+            {/* Item List Label */}
             <div className="text-left sm:text-right">
-              <span className="text-teal-500 text-[9px] uppercase tracking-wider block font-semibold">Packaging List No.</span>
+              <span className="text-teal-500 text-[9px] uppercase tracking-wider block font-semibold">Item List No.</span>
               <span className="text-slate-700 text-base font-mono font-bold leading-none">{listNo}</span>
               {sealType !== "none" && (
                 <span className={`mt-1 inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
@@ -414,8 +414,8 @@ export default function CreatePackagingList() {
                 ? `${customer.contracts
                     .map((id) => CONTRACT_TYPES[id]?.label)
                     .filter(Boolean)
-                    .join(" & ")} — Packaging List`
-                : "Packaging List"}
+                    .join(" & ")} — Item List`
+                : "Item List"}
             </h2>
             <div className="border border-teal-100 rounded-lg overflow-hidden text-xs bg-white">
               {/* Row 1: Date */}

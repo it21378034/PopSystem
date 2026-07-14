@@ -8,7 +8,7 @@ const navLinks = [
   { to: "/customers", label: "Customers" },
   { to: "/quotations/create", label: "Quotation" },
   { to: "/invoices", label: "Invoices" },
-  { to: "/packaging-lists", label: "Packaging Lists" },
+  { to: "/item-lists", label: "Item Lists" },
 ];
 
 export default function Header() {

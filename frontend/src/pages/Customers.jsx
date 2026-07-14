@@ -121,8 +121,8 @@ export default function Customers() {
     navigate("/quotations/create", { state: { customer } });
   };
 
-  const handleCreatePackagingList = (customer) => {
-    navigate("/packaging-lists/create", { state: { customer } });
+  const handleCreateItemList = (customer) => {
+    navigate("/item-lists/create", { state: { customer } });
   };
 
   const handleEdit = (customer) => {
@@ -483,9 +483,9 @@ export default function Customers() {
                           <ClipboardDocumentListIcon className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={() => handleCreatePackagingList(customer)}
+                          onClick={() => handleCreateItemList(customer)}
                           className="p-1.5 rounded-lg text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/30 transition"
-                          title="Create packaging list"
+                          title="Create item list"
                         >
                           <ArchiveBoxIcon className="h-4 w-4" />
                         </button>
@@ -575,11 +575,11 @@ export default function Customers() {
                 <span>Create Quotation</span>
               </button>
               <button
-                onClick={() => { setPostSaveDialog(null); handleCreatePackagingList(postSaveDialog); }}
+                onClick={() => { setPostSaveDialog(null); handleCreateItemList(postSaveDialog); }}
                 className="w-full px-4 py-2.5 flex items-center gap-3 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 transition shadow-sm"
               >
                 <ArchiveBoxIcon className="h-5 w-5 flex-shrink-0" />
-                <span>Create Packaging List</span>
+                <span>Create Item List</span>
               </button>
             </div>
             <div className="mt-4 text-center">

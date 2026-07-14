@@ -43,7 +43,7 @@ function SealBadge({ type }) {
   );
 }
 
-export default function PackagingLists() {
+export default function ItemLists() {
   const navigate = useNavigate();
   const [lists, setLists] = useState([]);
   const [search, setSearch] = useState("");
@@ -55,10 +55,10 @@ export default function PackagingLists() {
 
   const loadLists = async () => {
     try {
-      const data = await api.getPackagingLists();
+      const data = await api.getItemLists();
       setLists(data);
     } catch (e) {
-      console.error("Failed to load packaging lists:", e);
+      console.error("Failed to load item lists:", e);
       setLists([]);
     }
   };
@@ -70,16 +70,16 @@ export default function PackagingLists() {
   const confirmDelete = async () => {
     if (!deleteTarget) return;
     try {
-      await api.deletePackagingList(deleteTarget);
+      await api.deleteItemList(deleteTarget);
       setLists((prev) => prev.filter((l) => l.listNo !== deleteTarget));
       setDeleteTarget(null);
     } catch (err) {
-      console.error("Failed to delete packaging list:", err);
+      console.error("Failed to delete item list:", err);
     }
   };
 
   const handleOpen = (list) => {
-    navigate("/packaging-lists/create", {
+    navigate("/item-lists/create", {
       state: { customer: list.customer, existingList: list },
     });
   };
@@ -99,9 +99,9 @@ export default function PackagingLists() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Packaging Lists</h2>
+          <h2 className="text-3xl font-bold text-gray-800 dark:text-white">Item Lists</h2>
           <p className="text-gray-500 dark:text-gray-400 mt-1">
-            All saved packaging lists
+            All saved item lists
           </p>
         </div>
         <button
@@ -109,7 +109,7 @@ export default function PackagingLists() {
           className="flex items-center gap-2 bg-gradient-to-r from-teal-700 to-teal-900 hover:from-teal-600 hover:to-teal-800 text-white font-semibold px-5 py-2.5 rounded-lg shadow-md transition-all duration-200 transform hover:scale-105"
         >
           <ClipboardDocumentListIcon className="h-5 w-5" />
-          New Packaging List
+          New Item List
         </button>
       </div>
 
@@ -152,7 +152,7 @@ export default function PackagingLists() {
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-            Packaging List Records
+            Item List Records
             {lists.length > 0 && (
               <span className="ml-2 text-sm font-normal text-gray-400">
                 ({lists.length} {lists.length === 1 ? "list" : "lists"})
@@ -166,7 +166,7 @@ export default function PackagingLists() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search lists..."
+                placeholder="Search item lists..."
                 className="pl-9 pr-4 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500 transition w-56"
               />
             </div>
@@ -176,8 +176,8 @@ export default function PackagingLists() {
         {lists.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400 dark:text-gray-500">
             <DocumentTextIcon className="h-16 w-16 mb-4 opacity-20" />
-            <p className="text-lg font-medium">No packaging lists saved yet</p>
-            <p className="text-sm mt-1">Go to Customers and create a packaging list to get started</p>
+            <p className="text-lg font-medium">No item lists saved yet</p>
+            <p className="text-sm mt-1">Go to Customers and create an item list to get started</p>
             <button
               onClick={() => navigate("/customers")}
               className="mt-5 flex items-center gap-2 bg-teal-700 hover:bg-teal-600 text-white font-semibold px-5 py-2.5 rounded-lg shadow transition"
@@ -254,14 +254,14 @@ export default function PackagingLists() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleOpen(list)}
-                          title="View / Re-open packaging list"
+                          title="View / Re-open item list"
                           className="p-1.5 rounded-lg text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/30 transition"
                         >
                           <ArrowRightIcon className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(list.listNo)}
-                          title="Delete packaging list"
+                          title="Delete item list"
                           className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition"
                         >
                           <TrashIcon className="h-4 w-4" />
@@ -282,7 +282,7 @@ export default function PackagingLists() {
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-sm p-6">
             <div className="flex items-center gap-3 text-red-500 mb-4">
               <TrashIcon className="h-6 w-6" />
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Delete Packaging List?</h3>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Delete Item List?</h3>
             </div>
             <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
               Are you sure you want to delete <span className="font-bold text-gray-800 dark:text-white">{deleteTarget}</span>? This action cannot be undone.

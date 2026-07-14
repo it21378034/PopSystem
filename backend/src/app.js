@@ -7,7 +7,7 @@ const sequelize = require('./config/database');
 const Customer = require('./models/Customer');
 const Quotation = require('./models/Quotation');
 const Invoice = require('./models/Invoice');
-const PackagingList = require('./models/PackagingList');
+const ItemList = require('./models/ItemList');
 
 // Establish model associations
 Customer.hasMany(Quotation, { foreignKey: 'customerId', as: 'quotations', onDelete: 'CASCADE' });
@@ -16,8 +16,8 @@ Quotation.belongsTo(Customer, { foreignKey: 'customerId', as: 'customer' });
 Customer.hasMany(Invoice, { foreignKey: 'customerId', as: 'invoices', onDelete: 'CASCADE' });
 Invoice.belongsTo(Customer, { foreignKey: 'customerId', as: 'customer' });
 
-Customer.hasMany(PackagingList, { foreignKey: 'customerId', as: 'packagingLists', onDelete: 'CASCADE' });
-PackagingList.belongsTo(Customer, { foreignKey: 'customerId', as: 'customer' });
+Customer.hasMany(ItemList, { foreignKey: 'customerId', as: 'itemLists', onDelete: 'CASCADE' });
+ItemList.belongsTo(Customer, { foreignKey: 'customerId', as: 'customer' });
 
 // Sync database models
 sequelize.sync({ alter: true })
@@ -48,13 +48,13 @@ app.get('/api/health', async (req, res) => {
 const customerRoutes = require('./routes/customers');
 const quotationRoutes = require('./routes/quotations');
 const invoiceRoutes = require('./routes/invoices');
-const packagingListRoutes = require('./routes/packagingLists');
+const itemListRoutes = require('./routes/itemLists');
 const dashboardRoutes = require('./routes/dashboard');
 
 app.use('/api/customers', customerRoutes);
 app.use('/api/quotations', quotationRoutes);
 app.use('/api/invoices', invoiceRoutes);
-app.use('/api/packaging-lists', packagingListRoutes);
+app.use('/api/item-lists', itemListRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
 if (process.env.NODE_ENV !== 'production') {

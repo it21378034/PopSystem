@@ -26,11 +26,11 @@ export const api = {
   updateInvoice: (invoiceNo, invoice) => API.put(`/invoices/${invoiceNo}`, invoice).then(res => res.data),
   deleteInvoice: (invoiceNo) => API.delete(`/invoices/${invoiceNo}`).then(res => res.data),
 
-  // Packaging Lists CRUD
-  getPackagingLists: () => API.get('/packaging-lists').then(res => res.data),
-  createPackagingList: (list) => API.post('/packaging-lists', list).then(res => res.data),
-  updatePackagingList: (listNo, list) => API.put(`/packaging-lists/${listNo}`, list).then(res => res.data),
-  deletePackagingList: (listNo) => API.delete(`/packaging-lists/${listNo}`).then(res => res.data),
+  // Item Lists CRUD
+  getItemLists: () => API.get('/item-lists').then(res => res.data),
+  createItemList: (list) => API.post('/item-lists', list).then(res => res.data),
+  updateItemList: (listNo, list) => API.put(`/item-lists/${listNo}`, list).then(res => res.data),
+  deleteItemList: (listNo) => API.delete(`/item-lists/${listNo}`).then(res => res.data),
 };
 
 export default api;
