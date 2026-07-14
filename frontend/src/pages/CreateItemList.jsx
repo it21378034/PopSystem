@@ -160,73 +160,94 @@ export default function CreateItemList() {
       const cleanCustomerName = (customer?.name || "Customer").replace(/[^a-zA-Z0-9]/g, "");
       const filename = `${cleanCustomerName}_ItemList.pdf`;
 
-      // Clone the element so we can manipulate it without affecting the UI
-      const clone = element.cloneNode(true);
-
-      // Replace every <input> with a <span> showing its current value
-      clone.querySelectorAll("input").forEach((input, i) => {
-        const original = element.querySelectorAll("input")[i];
-        const rawValue = original ? original.value : input.value;
-        const span = document.createElement("span");
-        // Replace every space with a non-breaking space (\u00a0) so html2canvas
-        // NEVER collapses them — this is the only 100% reliable way to preserve
-        // spacing typed by the user (e.g. "25 x 25 mm      L Angle")
-        span.innerHTML = rawValue
+      // Encode text so every space becomes &nbsp; — html2canvas NEVER collapses &nbsp;
+      const encodeNbsp = (text) =>
+        text
           .replace(/&/g, "&amp;")
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;")
           .replace(/ /g, "&nbsp;");
-        span.style.display = "inline-block";
-        span.style.width = "100%";
-        span.className = input.className
-          .replace(/print:hidden/g, "")
-          .replace(/print:inline/g, "");
-        input.parentNode.replaceChild(span, input);
+
+      // Clone the element (does not copy live input .value — we handle that below)
+      const clone = element.cloneNode(true);
+
+      // Snapshot live values BEFORE cloning loses them
+      const liveInputs = Array.from(element.querySelectorAll("input"));
+      const liveTextareas = Array.from(element.querySelectorAll("textarea"));
+
+      // ── Step 1: For each cloned <input>, find its sibling "hidden print:inline" span
+      //    and inject the live value (with &nbsp; spacing) into it.
+      //    We do NOT create new spans — we update the existing ones to avoid duplication.
+      Array.from(clone.querySelectorAll("input")).forEach((cloneInput, i) => {
+        const liveValue = liveInputs[i]?.value ?? "";
+        const parent = cloneInput.parentNode;
+        // Find the sibling print:inline span in the same parent
+        const printSpan = Array.from(parent.children).find(
+          (el) => el !== cloneInput && typeof el.className === "string" && el.className.includes("print:inline")
+        );
+        if (printSpan) {
+          // Update its content with space-preserving encoding
+          printSpan.innerHTML = encodeNbsp(liveValue);
+        } else {
+          // No print:inline sibling — create a plain span (e.g. qty cell in saved view)
+          const span = document.createElement("span");
+          span.innerHTML = encodeNbsp(liveValue);
+          span.style.display = "inline-block";
+          parent.insertBefore(span, cloneInput);
+        }
       });
 
-      // Replace every <textarea> with a <span> showing its current value
-      clone.querySelectorAll("textarea").forEach((textarea, i) => {
-        const original = element.querySelectorAll("textarea")[i];
-        const span = document.createElement("span");
-        span.textContent = original ? original.value : textarea.value;
-        span.style.display = "block";
-        span.style.whiteSpace = "pre-wrap";
-        span.style.fontSize = "0.75rem";
-        span.style.color = "#475569";
-        span.style.fontStyle = "italic";
-        textarea.parentNode.replaceChild(span, textarea);
+      // ── Step 2: For each cloned <textarea>, find its sibling "hidden print:block" element
+      //    and inject the live value.
+      Array.from(clone.querySelectorAll("textarea")).forEach((cloneTa, i) => {
+        const liveValue = liveTextareas[i]?.value ?? "";
+        const parent = cloneTa.parentNode;
+        const printBlock = Array.from(parent.children).find(
+          (el) => el !== cloneTa && typeof el.className === "string" && el.className.includes("print:block")
+        );
+        if (printBlock) {
+          printBlock.innerHTML = encodeNbsp(liveValue);
+        } else if (liveValue) {
+          const span = document.createElement("span");
+          span.innerHTML = encodeNbsp(liveValue);
+          span.style.display = "block";
+          span.style.fontSize = "0.75rem";
+          span.style.color = "#475569";
+          span.style.fontStyle = "italic";
+          parent.insertBefore(span, cloneTa);
+        }
       });
 
-      // Remove elements marked as print:hidden (screen-only UI elements like buttons, add row, etc.)
-      clone.querySelectorAll(".print\\:hidden").forEach((el) => el.remove());
-
-      // Show elements marked as hidden print:inline or hidden print:block
-      clone.querySelectorAll(".hidden").forEach((el) => {
-        const cls = el.className || "";
-        if (cls.includes("print:inline") || cls.includes("print:block")) {
-          el.style.display = cls.includes("print:inline") ? "inline" : "block";
+      // ── Step 3: Show all "hidden print:inline" and "hidden print:block" elements
+      Array.from(clone.querySelectorAll(".hidden")).forEach((el) => {
+        const cls = typeof el.className === "string" ? el.className : "";
+        if (cls.includes("print:inline")) {
+          el.style.display = "inline";
+          el.classList.remove("hidden");
+        } else if (cls.includes("print:block")) {
+          el.style.display = "block";
           el.classList.remove("hidden");
         }
       });
 
-      // Attach to a hidden off-screen container so html2pdf can measure it
+      // ── Step 4: Remove all "print:hidden" elements (inputs, buttons, error msgs, etc.)
+      Array.from(clone.querySelectorAll("*")).forEach((el) => {
+        if (typeof el.className === "string" && el.className.includes("print:hidden") && el.parentNode) {
+          el.parentNode.removeChild(el);
+        }
+      });
+
+      // Attach to off-screen container so html2pdf can measure correctly
       const wrapper = document.createElement("div");
-      wrapper.style.cssText =
-        "position:fixed;left:-9999px;top:0;width:900px;background:#fff;";
+      wrapper.style.cssText = "position:fixed;left:-9999px;top:0;width:900px;background:#fff;";
       wrapper.appendChild(clone);
       document.body.appendChild(wrapper);
 
       const opt = {
         margin: [0.35, 0.4, 0.35, 0.4],
-        filename: filename,
+        filename,
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: {
-          scale: 2.2,
-          useCORS: true,
-          logging: false,
-          backgroundColor: "#ffffff",
-          windowWidth: 900,
-        },
+        html2canvas: { scale: 2.2, useCORS: true, logging: false, backgroundColor: "#ffffff", windowWidth: 900 },
         jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
       };
 
