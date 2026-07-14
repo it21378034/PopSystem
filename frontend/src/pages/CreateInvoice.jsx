@@ -577,13 +577,16 @@ export default function CreateInvoice() {
                           saved ? (
                             <span className="font-bold text-slate-800">{item.category}</span>
                           ) : (
-                            <input
-                              type="text"
-                              value={item.category}
-                              onChange={(e) => handleItemChange(idx, "category", e.target.value)}
-                              placeholder="e.g. Welding Services:"
-                              className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-800"
-                            />
+                            <>
+                              <input
+                                type="text"
+                                value={item.category}
+                                onChange={(e) => handleItemChange(idx, "category", e.target.value)}
+                                placeholder="e.g. Welding Services:"
+                                className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-slate-800 print:hidden"
+                              />
+                              <span className="hidden print:inline font-bold text-slate-800">{item.category}</span>
+                            </>
                           )
                         ) : (
                           <span className="text-slate-300 font-mono text-center block w-full">"</span>
@@ -603,10 +606,11 @@ export default function CreateInvoice() {
                               placeholder="Describe product / work details..."
                               className={`w-full bg-transparent border-b border-dashed ${
                                 errors[`item_${idx}_description`] ? "border-red-400" : "border-slate-200"
-                              } py-0.5 text-xs focus:outline-none focus:border-slate-800`}
+                              } py-0.5 text-xs focus:outline-none focus:border-slate-800 print:hidden`}
                             />
+                            <span className="hidden print:inline text-slate-700">{item.description}</span>
                             {errors[`item_${idx}_description`] && (
-                              <span className="text-[9px] text-red-500 block mt-0.5">Required</span>
+                              <span className="text-[9px] text-red-500 block mt-0.5 print:hidden">Required</span>
                             )}
                           </div>
                         )}
@@ -629,19 +633,24 @@ export default function CreateInvoice() {
                               placeholder="e.g. 6L"
                               className={`w-full bg-transparent border-b border-dashed ${
                                 errors[`item_${idx}_qty`] ? "border-red-400" : "border-slate-200"
-                              } py-0.5 text-xs text-right focus:outline-none focus:border-slate-800`}
+                              } py-0.5 text-xs text-right focus:outline-none focus:border-slate-800 print:hidden`}
                             />
                             <select
                               value={item.priceType || "unit"}
                               onChange={(e) => handleItemChange(idx, "priceType", e.target.value)}
-                              className="text-[9px] bg-white dark:bg-gray-700 border border-slate-200 text-slate-700 focus:outline-none cursor-pointer rounded px-0.5 py-0.5"
+                              className="text-[9px] bg-white dark:bg-gray-700 border border-slate-200 text-slate-700 focus:outline-none cursor-pointer rounded px-0.5 py-0.5 print:hidden"
                             >
                               <option value="unit">Unit</option>
                               <option value="liters">Liters</option>
                               <option value="text">Text</option>
                             </select>
+                            <span className="hidden print:inline font-mono">
+                              {item.priceType === "liters"
+                                ? (item.qty.trim().toLowerCase().endsWith("l") ? item.qty.trim() : `${item.qty.trim()}L`)
+                                : item.qty}
+                            </span>
                             {errors[`item_${idx}_qty`] && (
-                              <span className="text-[9px] text-red-500 block">Invalid</span>
+                              <span className="text-[9px] text-red-500 block print:hidden">Invalid</span>
                             )}
                           </div>
                         )}
@@ -662,10 +671,11 @@ export default function CreateInvoice() {
                               placeholder="0.00"
                               className={`w-full bg-transparent border-b border-dashed ${
                                 errors[`item_${idx}_unitPrice`] ? "border-red-400" : "border-slate-200"
-                              } py-0.5 text-xs text-right focus:outline-none focus:border-slate-800`}
+                              } py-0.5 text-xs text-right focus:outline-none focus:border-slate-800 print:hidden`}
                             />
+                            <span className="hidden print:inline font-mono">RS {fmt(item.unitPrice)}</span>
                             {errors[`item_${idx}_unitPrice`] && (
-                              <span className="text-[9px] text-red-500 block mt-0.5">Invalid</span>
+                              <span className="text-[9px] text-red-500 block mt-0.5 print:hidden">Invalid</span>
                             )}
                           </div>
                         )}

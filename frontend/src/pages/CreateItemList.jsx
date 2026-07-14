@@ -160,6 +160,56 @@ export default function CreateItemList() {
       const cleanCustomerName = (customer?.name || "Customer").replace(/[^a-zA-Z0-9]/g, "");
       const filename = `${cleanCustomerName}_ItemList.pdf`;
 
+      // Clone the element so we can manipulate it without affecting the UI
+      const clone = element.cloneNode(true);
+
+      // Replace every <input> with a <span> showing its current value
+      clone.querySelectorAll("input").forEach((input, i) => {
+        const original = element.querySelectorAll("input")[i];
+        const span = document.createElement("span");
+        span.textContent = original ? original.value : input.value;
+        span.style.cssText = input.style.cssText;
+        // Copy relevant inline styles for text appearance
+        span.style.display = "inline-block";
+        span.style.width = "100%";
+        span.className = input.className
+          .replace(/print:hidden/g, "")
+          .replace(/print:inline/g, "");
+        input.parentNode.replaceChild(span, input);
+      });
+
+      // Replace every <textarea> with a <span> showing its current value
+      clone.querySelectorAll("textarea").forEach((textarea, i) => {
+        const original = element.querySelectorAll("textarea")[i];
+        const span = document.createElement("span");
+        span.textContent = original ? original.value : textarea.value;
+        span.style.display = "block";
+        span.style.whiteSpace = "pre-wrap";
+        span.style.fontSize = "0.75rem";
+        span.style.color = "#475569";
+        span.style.fontStyle = "italic";
+        textarea.parentNode.replaceChild(span, textarea);
+      });
+
+      // Remove elements marked as print:hidden (screen-only UI elements like buttons, add row, etc.)
+      clone.querySelectorAll(".print\\:hidden").forEach((el) => el.remove());
+
+      // Show elements marked as hidden print:inline or hidden print:block
+      clone.querySelectorAll(".hidden").forEach((el) => {
+        const cls = el.className || "";
+        if (cls.includes("print:inline") || cls.includes("print:block")) {
+          el.style.display = cls.includes("print:inline") ? "inline" : "block";
+          el.classList.remove("hidden");
+        }
+      });
+
+      // Attach to a hidden off-screen container so html2pdf can measure it
+      const wrapper = document.createElement("div");
+      wrapper.style.cssText =
+        "position:fixed;left:-9999px;top:0;width:900px;background:#fff;";
+      wrapper.appendChild(clone);
+      document.body.appendChild(wrapper);
+
       const opt = {
         margin: [0.35, 0.4, 0.35, 0.4],
         filename: filename,
@@ -169,17 +219,15 @@ export default function CreateItemList() {
           useCORS: true,
           logging: false,
           backgroundColor: "#ffffff",
-          windowWidth: 1024
+          windowWidth: 900,
         },
-        jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
+        jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
       };
 
-      element.classList.add("pdf-exporting");
-      await html2pdf().from(element).set(opt).save();
-      element.classList.remove("pdf-exporting");
+      await html2pdf().from(clone).set(opt).save();
+      document.body.removeChild(wrapper);
     } catch (err) {
       console.error("Failed to generate PDF:", err);
-      listRef.current?.classList.remove("pdf-exporting");
     }
   };
 
@@ -486,13 +534,16 @@ export default function CreateItemList() {
                           saved ? (
                             <span className="font-bold text-slate-800">{item.category}</span>
                           ) : (
-                            <input
-                              type="text"
-                              value={item.category}
-                              onChange={(e) => handleItemChange(idx, "category", e.target.value)}
-                              placeholder="e.g. Welding Services:"
-                              className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-teal-600"
-                            />
+                            <>
+                              <input
+                                type="text"
+                                value={item.category}
+                                onChange={(e) => handleItemChange(idx, "category", e.target.value)}
+                                placeholder="e.g. Welding Services:"
+                                className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-teal-600 print:hidden"
+                              />
+                              <span className="hidden print:inline font-bold text-slate-800">{item.category}</span>
+                            </>
                           )
                         ) : (
                           <span className="text-slate-300 font-mono text-center block w-full">"</span>
@@ -512,10 +563,11 @@ export default function CreateItemList() {
                               placeholder="Item name / work description..."
                               className={`w-full bg-transparent border-b border-dashed ${
                                 errors[`item_${idx}_description`] ? "border-red-400" : "border-slate-200"
-                              } py-0.5 text-xs focus:outline-none focus:border-teal-600`}
+                              } py-0.5 text-xs focus:outline-none focus:border-teal-600 print:hidden`}
                             />
+                            <span className="hidden print:inline text-slate-700">{item.description}</span>
                             {errors[`item_${idx}_description`] && (
-                              <span className="text-[9px] text-red-500 block mt-0.5">Required</span>
+                              <span className="text-[9px] text-red-500 block mt-0.5 print:hidden">Required</span>
                             )}
                           </div>
                         )}
@@ -526,13 +578,16 @@ export default function CreateItemList() {
                         {saved ? (
                           <span className="font-mono">{item.qty}</span>
                         ) : (
-                          <input
-                            type="text"
-                            value={item.qty}
-                            onChange={(e) => handleItemChange(idx, "qty", e.target.value)}
-                            placeholder="e.g. 10 Nos"
-                            className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 text-xs text-right focus:outline-none focus:border-teal-600"
-                          />
+                          <>
+                            <input
+                              type="text"
+                              value={item.qty}
+                              onChange={(e) => handleItemChange(idx, "qty", e.target.value)}
+                              placeholder="e.g. 10 Nos"
+                              className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 text-xs text-right focus:outline-none focus:border-teal-600 print:hidden"
+                            />
+                            <span className="hidden print:inline font-mono">{item.qty}</span>
+                          </>
                         )}
                       </td>
 

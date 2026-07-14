@@ -412,38 +412,51 @@ export default function CreateQuotation() {
                             <div>
                               <input type="text" value={m.description} onChange={e => setMat(idx, "description", e.target.value)}
                                 placeholder="e.g. MS Square Pipe 40×40"
-                                className={`w-full bg-transparent border-b border-dashed ${errors[`mat_${idx}_desc`] ? "border-red-400" : "border-slate-200"} py-0.5 focus:outline-none focus:border-indigo-600 text-slate-800 placeholder-slate-400`} />
-                              {errors[`mat_${idx}_desc`] && <span className="text-[9px] text-red-500">Required</span>}
+                                className={`w-full bg-transparent border-b border-dashed ${errors[`mat_${idx}_desc`] ? "border-red-400" : "border-slate-200"} py-0.5 focus:outline-none focus:border-indigo-600 text-slate-800 placeholder-slate-400 print:hidden`} />
+                              <span className="hidden print:inline text-slate-700">{m.description}</span>
+                              {errors[`mat_${idx}_desc`] && <span className="text-[9px] text-red-500 print:hidden">Required</span>}
                             </div>
                           )}
                         </td>
                         <td className="px-3 py-2 border-r border-slate-100">
                           {saved ? <span className="text-slate-600">{m.specification}</span> : (
-                            <input type="text" value={m.specification} onChange={e => setMat(idx, "specification", e.target.value)}
-                              placeholder="Size / Grade"
-                              className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 focus:outline-none focus:border-indigo-600 text-slate-600 placeholder-slate-400" />
+                            <>
+                              <input type="text" value={m.specification} onChange={e => setMat(idx, "specification", e.target.value)}
+                                placeholder="Size / Grade"
+                                className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 focus:outline-none focus:border-indigo-600 text-slate-600 placeholder-slate-400 print:hidden" />
+                              <span className="hidden print:inline text-slate-600">{m.specification}</span>
+                            </>
                           )}
                         </td>
                         <td className="px-3 py-2 border-r border-slate-100 text-right">
                           {saved ? <span className="font-mono">{m.qty}</span> : (
-                            <input type="number" min="0" value={m.qty} onChange={e => setMat(idx, "qty", e.target.value)}
-                              placeholder="0"
-                              className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 focus:outline-none focus:border-indigo-600 text-right font-mono placeholder-slate-400" />
+                            <>
+                              <input type="number" min="0" value={m.qty} onChange={e => setMat(idx, "qty", e.target.value)}
+                                placeholder="0"
+                                className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 focus:outline-none focus:border-indigo-600 text-right font-mono placeholder-slate-400 print:hidden" />
+                              <span className="hidden print:inline font-mono">{m.qty}</span>
+                            </>
                           )}
                         </td>
                         <td className="px-3 py-2 border-r border-slate-100 text-center">
                           {saved ? <span>{m.unit}</span> : (
-                            <select value={m.unit} onChange={e => setMat(idx, "unit", e.target.value)}
-                              className="w-full bg-white dark:bg-gray-700 border border-slate-200 rounded text-[10px] focus:outline-none cursor-pointer px-0.5 py-0.5">
-                              {UNITS.map(u => <option key={u}>{u}</option>)}
-                            </select>
+                            <>
+                              <select value={m.unit} onChange={e => setMat(idx, "unit", e.target.value)}
+                                className="w-full bg-white dark:bg-gray-700 border border-slate-200 rounded text-[10px] focus:outline-none cursor-pointer px-0.5 py-0.5 print:hidden">
+                                {UNITS.map(u => <option key={u}>{u}</option>)}
+                              </select>
+                              <span className="hidden print:inline">{m.unit}</span>
+                            </>
                           )}
                         </td>
                         <td className="px-3 py-2 border-r border-slate-100 text-right font-mono">
                           {saved ? <span>RS {fmt(m.unitRate)}</span> : (
-                            <input type="number" min="0" step="0.01" value={m.unitRate} onChange={e => setMat(idx, "unitRate", e.target.value)}
-                              placeholder="0.00"
-                              className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 focus:outline-none focus:border-indigo-600 text-right font-mono placeholder-slate-400" />
+                            <>
+                              <input type="number" min="0" step="0.01" value={m.unitRate} onChange={e => setMat(idx, "unitRate", e.target.value)}
+                                placeholder="0.00"
+                                className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 focus:outline-none focus:border-indigo-600 text-right font-mono placeholder-slate-400 print:hidden" />
+                              <span className="hidden print:inline font-mono">RS {fmt(m.unitRate)}</span>
+                            </>
                           )}
                         </td>
                         <td className="px-3 py-2 text-right font-mono font-bold text-slate-800">RS {fmt(total)}</td>
@@ -508,23 +521,30 @@ export default function CreateQuotation() {
                             <div>
                               <input type="text" value={l.task} onChange={e => setLab(idx, "task", e.target.value)}
                                 placeholder="e.g. Fabrication & Welding"
-                                className={`w-full bg-transparent border-b border-dashed ${errors[`lab_${idx}_task`] ? "border-red-400" : "border-slate-200"} py-0.5 focus:outline-none focus:border-amber-500 text-slate-800 placeholder-slate-400`} />
-                              {errors[`lab_${idx}_task`] && <span className="text-[9px] text-red-500">Required</span>}
+                                className={`w-full bg-transparent border-b border-dashed ${errors[`lab_${idx}_task`] ? "border-red-400" : "border-slate-200"} py-0.5 focus:outline-none focus:border-amber-500 text-slate-800 placeholder-slate-400 print:hidden`} />
+                              <span className="hidden print:inline text-slate-700">{l.task}</span>
+                              {errors[`lab_${idx}_task`] && <span className="text-[9px] text-red-500 print:hidden">Required</span>}
                             </div>
                           )}
                         </td>
                         <td className="px-3 py-2 border-r border-slate-100 text-right">
                           {saved ? <span className="font-mono">{l.days}</span> : (
-                            <input type="number" min="0" value={l.days} onChange={e => setLab(idx, "days", e.target.value)}
-                              placeholder="0"
-                              className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 focus:outline-none focus:border-amber-500 text-right font-mono placeholder-slate-400" />
+                            <>
+                              <input type="number" min="0" value={l.days} onChange={e => setLab(idx, "days", e.target.value)}
+                                placeholder="0"
+                                className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 focus:outline-none focus:border-amber-500 text-right font-mono placeholder-slate-400 print:hidden" />
+                              <span className="hidden print:inline font-mono">{l.days}</span>
+                            </>
                           )}
                         </td>
                         <td className="px-3 py-2 border-r border-slate-100 text-right font-mono">
                           {saved ? <span>RS {fmt(l.ratePerDay)}</span> : (
-                            <input type="number" min="0" step="0.01" value={l.ratePerDay} onChange={e => setLab(idx, "ratePerDay", e.target.value)}
-                              placeholder="0.00"
-                              className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 focus:outline-none focus:border-amber-500 text-right font-mono placeholder-slate-400" />
+                            <>
+                              <input type="number" min="0" step="0.01" value={l.ratePerDay} onChange={e => setLab(idx, "ratePerDay", e.target.value)}
+                                placeholder="0.00"
+                                className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 focus:outline-none focus:border-amber-500 text-right font-mono placeholder-slate-400 print:hidden" />
+                              <span className="hidden print:inline font-mono">RS {fmt(l.ratePerDay)}</span>
+                            </>
                           )}
                         </td>
                         <td className="px-3 py-2 text-right font-mono font-bold text-slate-800">RS {fmt(total)}</td>
@@ -571,16 +591,22 @@ export default function CreateQuotation() {
                     <tr key={idx} className="hover:bg-slate-50/50">
                       <td className="px-3 py-2 border-r border-slate-100">
                         {saved ? <span className="text-slate-700">{e.description}</span> : (
-                          <input type="text" value={e.description} onChange={ev => setExt(idx, "description", ev.target.value)}
-                            placeholder="e.g. Transport, Welding Gas, Primer"
-                            className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 focus:outline-none focus:border-teal-500 text-slate-800 placeholder-slate-400" />
+                          <>
+                            <input type="text" value={e.description} onChange={ev => setExt(idx, "description", ev.target.value)}
+                              placeholder="e.g. Transport, Welding Gas, Primer"
+                              className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 focus:outline-none focus:border-teal-500 text-slate-800 placeholder-slate-400 print:hidden" />
+                            <span className="hidden print:inline text-slate-700">{e.description}</span>
+                          </>
                         )}
                       </td>
                       <td className="px-3 py-2 text-right font-mono">
                         {saved ? <span className="font-bold">RS {fmt(e.amount)}</span> : (
-                          <input type="number" min="0" step="0.01" value={e.amount} onChange={ev => setExt(idx, "amount", ev.target.value)}
-                            placeholder="0.00"
-                            className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 focus:outline-none focus:border-teal-500 text-right font-mono placeholder-slate-400" />
+                          <>
+                            <input type="number" min="0" step="0.01" value={e.amount} onChange={ev => setExt(idx, "amount", ev.target.value)}
+                              placeholder="0.00"
+                              className="w-full bg-transparent border-b border-dashed border-slate-200 py-0.5 focus:outline-none focus:border-teal-500 text-right font-mono placeholder-slate-400 print:hidden" />
+                            <span className="hidden print:inline font-bold">RS {fmt(e.amount)}</span>
+                          </>
                         )}
                       </td>
                       {!saved && (
