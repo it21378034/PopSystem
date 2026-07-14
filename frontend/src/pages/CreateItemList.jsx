@@ -147,97 +147,143 @@ export default function CreateItemList() {
     }
   };
 
-  const handlePrint = () => {
-    window.print();
+  // ─── Shared helper: build a clean, print-ready clone of the document ──────────
+  // Injects live input values, preserves spaces as &nbsp;, shows print-only spans,
+  // removes screen-only elements. Used by both Print and Download PDF.
+  const buildPrintClone = () => {
+    const element = listRef.current;
+    if (!element) return null;
+
+    // Encode text so every space → &nbsp; (never collapsed by any renderer)
+    const encodeNbsp = (text) =>
+      text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/ /g, "&nbsp;");
+
+    const clone = element.cloneNode(true);
+
+    // Snapshot live values from the real DOM (cloneNode doesn't copy .value)
+    const liveInputs = Array.from(element.querySelectorAll("input"));
+    const liveTextareas = Array.from(element.querySelectorAll("textarea"));
+
+    // Step 1 – inject input values into their sibling print:inline spans
+    Array.from(clone.querySelectorAll("input")).forEach((cloneInput, i) => {
+      const liveValue = liveInputs[i]?.value ?? "";
+      const parent = cloneInput.parentNode;
+      const printSpan = Array.from(parent.children).find(
+        (el) =>
+          el !== cloneInput &&
+          typeof el.className === "string" &&
+          el.className.includes("print:inline")
+      );
+      if (printSpan) {
+        printSpan.innerHTML = encodeNbsp(liveValue);
+      } else {
+        const span = document.createElement("span");
+        span.innerHTML = encodeNbsp(liveValue);
+        span.style.display = "inline-block";
+        parent.insertBefore(span, cloneInput);
+      }
+    });
+
+    // Step 2 – inject textarea values into their sibling print:block elements
+    Array.from(clone.querySelectorAll("textarea")).forEach((cloneTa, i) => {
+      const liveValue = liveTextareas[i]?.value ?? "";
+      const parent = cloneTa.parentNode;
+      const printBlock = Array.from(parent.children).find(
+        (el) =>
+          el !== cloneTa &&
+          typeof el.className === "string" &&
+          el.className.includes("print:block")
+      );
+      if (printBlock) {
+        printBlock.innerHTML = encodeNbsp(liveValue);
+      } else if (liveValue) {
+        const span = document.createElement("span");
+        span.innerHTML = encodeNbsp(liveValue);
+        span.style.display = "block";
+        span.style.fontSize = "0.75rem";
+        span.style.color = "#475569";
+        span.style.fontStyle = "italic";
+        parent.insertBefore(span, cloneTa);
+      }
+    });
+
+    // Step 3 – make hidden print:inline / print:block spans visible
+    Array.from(clone.querySelectorAll(".hidden")).forEach((el) => {
+      const cls = typeof el.className === "string" ? el.className : "";
+      if (cls.includes("print:inline")) {
+        el.style.display = "inline";
+        el.classList.remove("hidden");
+      } else if (cls.includes("print:block")) {
+        el.style.display = "block";
+        el.classList.remove("hidden");
+      }
+    });
+
+    // Step 4 – remove all print:hidden elements (inputs, action buttons, errors, etc.)
+    Array.from(clone.querySelectorAll("*")).forEach((el) => {
+      if (
+        typeof el.className === "string" &&
+        el.className.includes("print:hidden") &&
+        el.parentNode
+      ) {
+        el.parentNode.removeChild(el);
+      }
+    });
+
+    return clone;
   };
 
+  // ─── Print button: open a new window with the clean clone and print it ────────
+  const handlePrint = () => {
+    const clone = buildPrintClone();
+    if (!clone) return;
+
+    // Grab all <link> and <style> tags from the current page so fonts/styles carry over
+    const styles = Array.from(
+      document.querySelectorAll('link[rel="stylesheet"], style')
+    )
+      .map((el) => el.outerHTML)
+      .join("\n");
+
+    const printWindow = window.open("", "_blank", "width=900,height=700");
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>Item List – ${customer?.name || ""}</title>
+          ${styles}
+          <style>
+            body { margin: 0; padding: 24px; background: #fff; font-family: sans-serif; }
+            @media print { body { padding: 0; } }
+          </style>
+        </head>
+        <body>${clone.outerHTML}</body>
+      </html>
+    `);
+    printWindow.document.close();
+    // Wait for resources (fonts/images) then print
+    printWindow.onload = () => {
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    };
+  };
+
+  // ─── Download PDF button: same clone → html2pdf ───────────────────────────────
   const handleGeneratePDF = async () => {
     try {
       const html2pdf = (await import("html2pdf.js")).default;
-      const element = listRef.current;
-      if (!element) return;
+      const clone = buildPrintClone();
+      if (!clone) return;
 
       const cleanCustomerName = (customer?.name || "Customer").replace(/[^a-zA-Z0-9]/g, "");
       const filename = `${cleanCustomerName}_ItemList.pdf`;
 
-      // Encode text so every space becomes &nbsp; — html2canvas NEVER collapses &nbsp;
-      const encodeNbsp = (text) =>
-        text
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/ /g, "&nbsp;");
-
-      // Clone the element (does not copy live input .value — we handle that below)
-      const clone = element.cloneNode(true);
-
-      // Snapshot live values BEFORE cloning loses them
-      const liveInputs = Array.from(element.querySelectorAll("input"));
-      const liveTextareas = Array.from(element.querySelectorAll("textarea"));
-
-      // ── Step 1: For each cloned <input>, find its sibling "hidden print:inline" span
-      //    and inject the live value (with &nbsp; spacing) into it.
-      //    We do NOT create new spans — we update the existing ones to avoid duplication.
-      Array.from(clone.querySelectorAll("input")).forEach((cloneInput, i) => {
-        const liveValue = liveInputs[i]?.value ?? "";
-        const parent = cloneInput.parentNode;
-        // Find the sibling print:inline span in the same parent
-        const printSpan = Array.from(parent.children).find(
-          (el) => el !== cloneInput && typeof el.className === "string" && el.className.includes("print:inline")
-        );
-        if (printSpan) {
-          // Update its content with space-preserving encoding
-          printSpan.innerHTML = encodeNbsp(liveValue);
-        } else {
-          // No print:inline sibling — create a plain span (e.g. qty cell in saved view)
-          const span = document.createElement("span");
-          span.innerHTML = encodeNbsp(liveValue);
-          span.style.display = "inline-block";
-          parent.insertBefore(span, cloneInput);
-        }
-      });
-
-      // ── Step 2: For each cloned <textarea>, find its sibling "hidden print:block" element
-      //    and inject the live value.
-      Array.from(clone.querySelectorAll("textarea")).forEach((cloneTa, i) => {
-        const liveValue = liveTextareas[i]?.value ?? "";
-        const parent = cloneTa.parentNode;
-        const printBlock = Array.from(parent.children).find(
-          (el) => el !== cloneTa && typeof el.className === "string" && el.className.includes("print:block")
-        );
-        if (printBlock) {
-          printBlock.innerHTML = encodeNbsp(liveValue);
-        } else if (liveValue) {
-          const span = document.createElement("span");
-          span.innerHTML = encodeNbsp(liveValue);
-          span.style.display = "block";
-          span.style.fontSize = "0.75rem";
-          span.style.color = "#475569";
-          span.style.fontStyle = "italic";
-          parent.insertBefore(span, cloneTa);
-        }
-      });
-
-      // ── Step 3: Show all "hidden print:inline" and "hidden print:block" elements
-      Array.from(clone.querySelectorAll(".hidden")).forEach((el) => {
-        const cls = typeof el.className === "string" ? el.className : "";
-        if (cls.includes("print:inline")) {
-          el.style.display = "inline";
-          el.classList.remove("hidden");
-        } else if (cls.includes("print:block")) {
-          el.style.display = "block";
-          el.classList.remove("hidden");
-        }
-      });
-
-      // ── Step 4: Remove all "print:hidden" elements (inputs, buttons, error msgs, etc.)
-      Array.from(clone.querySelectorAll("*")).forEach((el) => {
-        if (typeof el.className === "string" && el.className.includes("print:hidden") && el.parentNode) {
-          el.parentNode.removeChild(el);
-        }
-      });
-
-      // Attach to off-screen container so html2pdf can measure correctly
       const wrapper = document.createElement("div");
       wrapper.style.cssText = "position:fixed;left:-9999px;top:0;width:900px;background:#fff;";
       wrapper.appendChild(clone);
