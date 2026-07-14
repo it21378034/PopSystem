@@ -172,6 +172,8 @@ export default function CreateItemList() {
         // Copy relevant inline styles for text appearance
         span.style.display = "inline-block";
         span.style.width = "100%";
+        // Preserve multiple spaces / tabs typed by the user
+        span.style.whiteSpace = "pre-wrap";
         span.className = input.className
           .replace(/print:hidden/g, "")
           .replace(/print:inline/g, "");
