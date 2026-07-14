@@ -166,14 +166,18 @@ export default function CreateItemList() {
       // Replace every <input> with a <span> showing its current value
       clone.querySelectorAll("input").forEach((input, i) => {
         const original = element.querySelectorAll("input")[i];
+        const rawValue = original ? original.value : input.value;
         const span = document.createElement("span");
-        span.textContent = original ? original.value : input.value;
-        span.style.cssText = input.style.cssText;
-        // Copy relevant inline styles for text appearance
+        // Replace every space with a non-breaking space (\u00a0) so html2canvas
+        // NEVER collapses them — this is the only 100% reliable way to preserve
+        // spacing typed by the user (e.g. "25 x 25 mm      L Angle")
+        span.innerHTML = rawValue
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/ /g, "&nbsp;");
         span.style.display = "inline-block";
         span.style.width = "100%";
-        // Preserve multiple spaces / tabs typed by the user
-        span.style.whiteSpace = "pre-wrap";
         span.className = input.className
           .replace(/print:hidden/g, "")
           .replace(/print:inline/g, "");
