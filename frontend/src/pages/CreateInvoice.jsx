@@ -736,13 +736,22 @@ export default function CreateInvoice() {
                 </p>
               )
             ) : (
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Add notes, special payment conditions, terms here..."
-                rows={2}
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs focus:outline-none focus:ring-1 focus:ring-slate-800 resize-none text-slate-700 placeholder-slate-400"
-              />
+              <>
+                {/* Shown only on screen when editing */}
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Add notes, special payment conditions, terms here..."
+                  rows={2}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs focus:outline-none focus:ring-1 focus:ring-slate-800 resize-none text-slate-700 placeholder-slate-400 print:hidden"
+                />
+                {/* Shown only in print/PDF */}
+                {notes && (
+                  <p className="hidden print:block text-slate-600 italic bg-slate-50 p-2.5 rounded-lg border border-slate-200 leading-relaxed">
+                    {notes}
+                  </p>
+                )}
+              </>
             )}
           </div>
           <div className="text-right space-y-8 min-w-[180px] self-end">

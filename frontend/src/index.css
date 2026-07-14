@@ -64,3 +64,25 @@
 .pdf-exporting .print\:hidden {
   display: none !important;
 }
+
+/* Extra safety: hide all textarea/input boxes inside document areas during print */
+@media print {
+  #invoice-print-area textarea,
+  #quotation-print-area textarea,
+  #item-list-print-area textarea,
+  #invoice-print-area input,
+  #quotation-print-area input,
+  #item-list-print-area input {
+    display: none !important;
+  }
+}
+
+/* Extra safety: hide all textarea/input boxes inside document areas during PDF export */
+.pdf-exporting #invoice-print-area textarea,
+.pdf-exporting #quotation-print-area textarea,
+.pdf-exporting #item-list-print-area textarea,
+.pdf-exporting #invoice-print-area input,
+.pdf-exporting #quotation-print-area input,
+.pdf-exporting #item-list-print-area input {
+  display: none !important;
+}

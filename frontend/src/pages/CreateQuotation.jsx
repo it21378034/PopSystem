@@ -682,10 +682,15 @@ export default function CreateQuotation() {
               {saved ? (
                 <p className="text-xs text-slate-600 italic">{notes || "—"}</p>
               ) : (
-                <textarea value={notes} onChange={e => setNotes(e.target.value)}
-                  rows={5}
-                  className="w-full bg-white border border-slate-200 rounded p-2 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400 resize-none text-slate-700 placeholder-slate-400"
-                  placeholder="Any additional notes, special requirements, or site conditions..." />
+                <>
+                  {/* Shown only on screen when editing */}
+                  <textarea value={notes} onChange={e => setNotes(e.target.value)}
+                    rows={5}
+                    className="w-full bg-white border border-slate-200 rounded p-2 text-xs focus:outline-none focus:ring-1 focus:ring-indigo-400 resize-none text-slate-700 placeholder-slate-400 print:hidden"
+                    placeholder="Any additional notes, special requirements, or site conditions..." />
+                  {/* Shown only in print/PDF */}
+                  <p className="hidden print:block text-xs text-slate-600 italic">{notes || "—"}</p>
+                </>
               )}
             </div>
           </div>
@@ -709,9 +714,10 @@ export default function CreateQuotation() {
                   ) : (
                     <div className="flex-1 flex items-center gap-1">
                       <input type="text" value={tc} onChange={e => setTc(idx, e.target.value)}
-                        className="flex-1 bg-transparent border-b border-dashed border-slate-200 py-0.5 focus:outline-none focus:border-indigo-400 text-slate-700 placeholder-slate-400"
+                        className="flex-1 bg-transparent border-b border-dashed border-slate-200 py-0.5 focus:outline-none focus:border-indigo-400 text-slate-700 placeholder-slate-400 print:hidden"
                         placeholder="Add a term or condition..." />
-                      <button onClick={() => removeTc(idx)} disabled={tcLines.length === 1} className="text-red-400 hover:text-red-600 transition flex-shrink-0">
+                      <span className="hidden print:inline text-slate-700">{tc}</span>
+                      <button onClick={() => removeTc(idx)} disabled={tcLines.length === 1} className="text-red-400 hover:text-red-600 transition flex-shrink-0 print:hidden">
                         <TrashIcon className="h-3 w-3" />
                       </button>
                     </div>
