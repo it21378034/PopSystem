@@ -8,6 +8,8 @@ import Quotations from "./pages/Quotations";
 import CreateQuotation from "./pages/CreateQuotation";
 import Invoices from "./pages/Invoices";
 import CreateInvoice from "./pages/CreateInvoice";
+import PackagingLists from "./pages/PackagingLists";
+import CreatePackagingList from "./pages/CreatePackagingList";
 import Inventory from "./pages/Inventory";
 import Settings from "./pages/Settings";
 
@@ -32,6 +34,8 @@ export default function App() {
           <Route path="/quotations/create" element={<CreateQuotation />} />
           <Route path="/invoices/create" element={<CreateInvoice />} />
           <Route path="/invoices" element={<Invoices />} />
+          <Route path="/packaging-lists/create" element={<CreatePackagingList />} />
+          <Route path="/packaging-lists" element={<PackagingLists />} />
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<Navigate to="/" replace />} />

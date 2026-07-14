@@ -25,6 +25,12 @@ export const api = {
   createInvoice: (invoice) => API.post('/invoices', invoice).then(res => res.data),
   updateInvoice: (invoiceNo, invoice) => API.put(`/invoices/${invoiceNo}`, invoice).then(res => res.data),
   deleteInvoice: (invoiceNo) => API.delete(`/invoices/${invoiceNo}`).then(res => res.data),
+
+  // Packaging Lists CRUD
+  getPackagingLists: () => API.get('/packaging-lists').then(res => res.data),
+  createPackagingList: (list) => API.post('/packaging-lists', list).then(res => res.data),
+  updatePackagingList: (listNo, list) => API.put(`/packaging-lists/${listNo}`, list).then(res => res.data),
+  deletePackagingList: (listNo) => API.delete(`/packaging-lists/${listNo}`).then(res => res.data),
 };
 
 export default api;
