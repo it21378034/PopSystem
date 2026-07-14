@@ -11,6 +11,7 @@ import {
   TrashIcon,
   DocumentTextIcon,
   ClipboardDocumentListIcon,
+  ArchiveBoxIcon,
 } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
@@ -118,6 +119,10 @@ export default function Customers() {
 
   const handleCreateQuotation = (customer) => {
     navigate("/quotations/create", { state: { customer } });
+  };
+
+  const handleCreatePackagingList = (customer) => {
+    navigate("/packaging-lists/create", { state: { customer } });
   };
 
   const handleEdit = (customer) => {
@@ -478,6 +483,13 @@ export default function Customers() {
                           <ClipboardDocumentListIcon className="h-4 w-4" />
                         </button>
                         <button
+                          onClick={() => handleCreatePackagingList(customer)}
+                          className="p-1.5 rounded-lg text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/30 transition"
+                          title="Create packaging list"
+                        >
+                          <ArchiveBoxIcon className="h-4 w-4" />
+                        </button>
+                        <button
                           onClick={() => handleEdit(customer)}
                           className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition"
                           title="Edit customer"
@@ -535,31 +547,45 @@ export default function Customers() {
       {postSaveDialog !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-sm p-6 transform transition-all">
-            <div className="flex items-center gap-3 text-blue-600 mb-4">
-              <CheckIcon className="h-6 w-6" />
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Customer Saved!</h3>
+            <div className="flex items-center gap-3 text-green-600 mb-2">
+              <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center">
+                <CheckIcon className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Customer Saved!</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{postSaveDialog?.name} has been added</p>
+              </div>
             </div>
-            <p className="text-gray-600 dark:text-gray-300 text-sm mb-6">
-              Do you want to create an Invoice or Quotation for <span className="font-bold text-gray-800 dark:text-white">{postSaveDialog?.name}</span>?
+            <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 mt-3">
+              What would you like to create for <span className="font-bold text-gray-800 dark:text-white">{postSaveDialog?.name}</span>?
             </p>
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col gap-2">
               <button
-                onClick={() => handleCreateInvoice(postSaveDialog)}
-                className="flex-1 px-4 py-2 flex justify-center items-center gap-2 rounded-lg text-sm font-semibold text-white bg-green-600 hover:bg-green-700 transition"
+                onClick={() => { setPostSaveDialog(null); handleCreateInvoice(postSaveDialog); }}
+                className="w-full px-4 py-2.5 flex items-center gap-3 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 transition shadow-sm"
               >
-                <DocumentTextIcon className="h-4 w-4" /> Invoice
+                <DocumentTextIcon className="h-5 w-5 flex-shrink-0" />
+                <span>Create Invoice / Estimate</span>
               </button>
               <button
-                onClick={() => handleCreateQuotation(postSaveDialog)}
-                className="flex-1 px-4 py-2 flex justify-center items-center gap-2 rounded-lg text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition"
+                onClick={() => { setPostSaveDialog(null); handleCreateQuotation(postSaveDialog); }}
+                className="w-full px-4 py-2.5 flex items-center gap-3 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 transition shadow-sm"
               >
-                <ClipboardDocumentListIcon className="h-4 w-4" /> Quotation
+                <ClipboardDocumentListIcon className="h-5 w-5 flex-shrink-0" />
+                <span>Create Quotation</span>
+              </button>
+              <button
+                onClick={() => { setPostSaveDialog(null); handleCreatePackagingList(postSaveDialog); }}
+                className="w-full px-4 py-2.5 flex items-center gap-3 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 transition shadow-sm"
+              >
+                <ArchiveBoxIcon className="h-5 w-5 flex-shrink-0" />
+                <span>Create Packaging List</span>
               </button>
             </div>
             <div className="mt-4 text-center">
               <button
                 onClick={() => setPostSaveDialog(null)}
-                className="text-sm font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                className="text-sm font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition"
               >
                 No, maybe later
               </button>
